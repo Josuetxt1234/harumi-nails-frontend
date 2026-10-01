@@ -1,32 +1,16 @@
 import { ReactNode } from 'react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SYSTEM_ROLES } from '../../../constants/roles.constants';
 import { useAuth } from '../../../context/AuthContext';
+import { getDefaultRouteForRoles } from '../../../lib/get-default-route';
 
 interface ProfileShellProps {
   children: ReactNode;
 }
 
-function getBackRoute(roles: string[]): string {
-  if (roles.includes(SYSTEM_ROLES.SUPER_ADMIN)) {
-    return '/dashboard/users';
-  }
-
-  if (roles.includes(SYSTEM_ROLES.ADMIN)) {
-    return '/admin/staff';
-  }
-
-  if (roles.includes(SYSTEM_ROLES.MESA)) {
-    return '/mesa/registro-diario';
-  }
-
-  return '/profile';
-}
-
 export function ProfileShell({ children }: ProfileShellProps) {
   const { user, logout } = useAuth();
-  const backRoute = getBackRoute(user?.roles ?? []);
+  const backRoute = getDefaultRouteForRoles(user?.roles ?? [], user?.permissions);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">

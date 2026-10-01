@@ -23,7 +23,7 @@ export function AdminRoute() {
     user?.roles?.includes(SYSTEM_ROLES.SUPER_ADMIN);
 
   if (!isAdmin) {
-    return <Navigate to={getDefaultRouteForRoles(user?.roles ?? [])} replace />;
+    return <Navigate to={getDefaultRouteForRoles(user?.roles ?? [], user?.permissions)} replace />;
   }
 
   return <Outlet />;

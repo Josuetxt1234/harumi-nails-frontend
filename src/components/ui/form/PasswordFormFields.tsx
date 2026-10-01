@@ -1,5 +1,6 @@
 import { RefreshCw } from 'lucide-react';
 import { generateRandomPassword } from '../../../lib/generate-password';
+import { PasswordInput } from './PasswordInput';
 
 export interface PasswordFormValues {
   currentPassword: string;
@@ -44,13 +45,12 @@ export function PasswordFormFields({
           <label className="text-sm font-semibold text-slate-heading">
             Current Password
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={values.currentPassword}
             onChange={(event) =>
               updateField('currentPassword', event.target.value)
             }
-            className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+            autoComplete="current-password"
             required
           />
         </div>
@@ -72,12 +72,10 @@ export function PasswordFormFields({
             </button>
           ) : null}
         </div>
-        <input
-          type={mode === 'reset' ? 'text' : 'password'}
+        <PasswordInput
           value={values.newPassword}
           onChange={(event) => updateField('newPassword', event.target.value)}
           autoComplete="new-password"
-          className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           required
           minLength={8}
         />
@@ -87,14 +85,12 @@ export function PasswordFormFields({
         <label className="text-sm font-semibold text-slate-heading">
           {confirmPasswordLabel}
         </label>
-        <input
-          type={mode === 'reset' ? 'text' : 'password'}
+        <PasswordInput
           value={values.confirmPassword}
           onChange={(event) =>
             updateField('confirmPassword', event.target.value)
           }
           autoComplete="new-password"
-          className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           required
           minLength={8}
         />

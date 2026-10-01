@@ -1,4 +1,3 @@
-import { Eye, EyeOff } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -8,6 +7,7 @@ import {
 } from '../../lib/auth-storage';
 import { getDefaultRouteForRoles } from '../../lib/get-default-route';
 import { getApiErrorMessage } from '../../lib/get-api-error';
+import { PasswordInput } from '../ui/form/PasswordInput';
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -40,7 +39,7 @@ export function LoginForm() {
         rememberMe,
       });
 
-      navigate(getDefaultRouteForRoles(authenticatedUser.roles), {
+        navigate(getDefaultRouteForRoles(authenticatedUser.roles, authenticatedUser.permissions), {
         replace: true,
       });
     } catch (error) {
@@ -108,31 +107,16 @@ export function LoginForm() {
             </a>
           </div>
 
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete={rememberMe ? 'current-password' : 'password'}
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-xl border border-slate-border bg-white px-4 py-3 pr-12 text-sm text-slate-heading shadow-input outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-              required
-            />
-            <button
-              type="button"
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              onClick={() => setShowPassword((current) => !current)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-muted transition hover:text-slate-heading"
-            >
-              {showPassword ? (
-                <EyeOff className="h-5 w-5" strokeWidth={1.75} />
-              ) : (
-                <Eye className="h-5 w-5" strokeWidth={1.75} />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            autoComplete={rememberMe ? 'current-password' : 'password'}
+            placeholder="••••••••"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="w-full rounded-xl border border-slate-border bg-white px-4 py-3 pr-12 text-sm text-slate-heading shadow-input outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+            required
+          />
         </div>
 
         <label className="flex cursor-pointer items-center gap-3">

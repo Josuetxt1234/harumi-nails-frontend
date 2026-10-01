@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SYSTEM_ROLES, SystemRole } from '../constants/roles.constants';
+import { SystemRole } from '../constants/roles.constants';
 import {
   activateUser,
   changeUserPassword,
@@ -37,13 +37,13 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
   const [roleFilter, setRoleFilter] = useState<'all' | SystemRole>(
     fixedRole ?? 'all',
   );
-  const [total, setTotal] = useState(0);
   const [metrics, setMetrics] = useState<UsersMetrics>({
     total: 0,
     active: 0,
     inactive: 0,
   });
   const [roleIdMap, setRoleIdMap] = useState<Record<string, string>>({});
+  const [areRolesReady, setAreRolesReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -68,9 +68,15 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         setRoleIdMap(
           Object.fromEntries(roles.map((role) => [role.name, role.id])),
         );
-      } catch {
+      } catch (error) {
         if (isMounted) {
-          setErrorMessage('Unable to load roles.');
+          setErrorMessage(
+            error instanceof Error ? error.message : 'Unable to load roles.',
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setAreRolesReady(true);
         }
       }
     }
@@ -107,7 +113,6 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
     });
 
     setUsers(response.users);
-    setTotal(response.total);
   }, [debouncedSearch, statusFilter, resolvedRoleId]);
 
   const refreshMetrics = useCallback(async () => {
@@ -123,13 +128,21 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
   }, [config.showMetrics, fixedRole, resolvedRoleId]);
 
   useEffect(() => {
+    if (!areRolesReady) {
+      return;
+    }
+
     let isMounted = true;
 
     async function loadUsers() {
       setIsLoading(true);
-      setErrorMessage('');
 
       try {
+        if (fixedRole && !roleIdMap[fixedRole]) {
+          throw new Error('Unable to load roles.');
+        }
+
+        setErrorMessage('');
         await Promise.all([refreshUsers(), refreshMetrics()]);
       } catch (error) {
         if (isMounted) {
@@ -146,14 +159,12 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
       }
     }
 
-    if (Object.keys(roleIdMap).length > 0 || fixedRole === undefined) {
-      loadUsers();
-    }
+    loadUsers();
 
     return () => {
       isMounted = false;
     };
-  }, [refreshUsers, refreshMetrics, roleIdMap, fixedRole]);
+  }, [areRolesReady, refreshUsers, refreshMetrics, roleIdMap, fixedRole]);
 
   const handleCreateUser = useCallback(
     async (input: CreateUserInput) => {
@@ -272,17 +283,12 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
     setStatusFilter: handleStatusFilterChange,
     roleFilter: fixedRole ?? roleFilter,
     setRoleFilter: handleRoleFilterChange,
-    total,
     errorMessage,
-    setErrorMessage,
     createUser: handleCreateUser,
     updateUser: handleUpdateUser,
     toggleUserStatus: handleToggleUserStatus,
     deleteUser: handleDeleteUser,
     changeUserPassword: handleChangePassword,
     fixedRole,
-    allowedRoles: fixedRole
-      ? [fixedRole]
-      : [SYSTEM_ROLES.ADMIN, SYSTEM_ROLES.MESA, SYSTEM_ROLES.SUPER_ADMIN],
   };
 }

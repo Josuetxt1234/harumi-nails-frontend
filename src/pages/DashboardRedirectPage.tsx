@@ -5,5 +5,5 @@ import { getDefaultRouteForRoles } from '../lib/get-default-route';
 export function DashboardRedirectPage() {
   const { user } = useAuth();
 
-  return <Navigate to={getDefaultRouteForRoles(user?.roles ?? [])} replace />;
+  return <Navigate to={getDefaultRouteForRoles(user?.roles ?? [], user?.permissions)} replace />;
 }

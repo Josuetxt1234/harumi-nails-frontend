@@ -1,43 +1,53 @@
 import { RolePermissionsView } from '../../components/features/roles/RolePermissionsView';
 import { UsersManagementView } from '../../components/features/users/UsersManagementView';
 import { ModulePage } from '../../components/ui/layout/ModulePage';
+import { PERMISSIONS } from '../../constants/permissions.constants';
+import { useAuth } from '../../context/AuthContext';
 import { useModuleTab } from '../../hooks/useModuleTab';
 
-const USERS_MODULE_TABS = [
-  { id: 'users', label: 'Usuarios' },
-  { id: 'permissions', label: 'Permisos' },
-] as const;
-
-const USERS_MODULE_TAB_IDS = USERS_MODULE_TABS.map((tab) => tab.id);
+const USERS_TAB = { id: 'users', label: 'Usuarios' } as const;
+const PERMISSIONS_TAB = { id: 'permissions', label: 'Permisos' } as const;
 
 export function DashboardUsersPage() {
-  const { activeTab, setActiveTab } = useModuleTab(
-    USERS_MODULE_TAB_IDS,
-    'users',
-  );
+  const { hasAnyPermission } = useAuth();
+  const canManageUsers = hasAnyPermission([PERMISSIONS.USERS_LIST]);
+  const canManageRolePermissions = hasAnyPermission([
+    PERMISSIONS.ROLES_LIST,
+    PERMISSIONS.ROLES_READ,
+    PERMISSIONS.PERMISSIONS_LIST,
+    PERMISSIONS.PERMISSIONS_ASSIGN_TO_ROLE,
+  ]);
+
+  const tabs = [
+    ...(canManageUsers ? [USERS_TAB] : []),
+    ...(canManageRolePermissions ? [PERMISSIONS_TAB] : []),
+  ];
+  const tabIds = tabs.map((tab) => tab.id);
+  const defaultTab = tabIds[0] ?? USERS_TAB.id;
+  const { activeTab, setActiveTab } = useModuleTab(tabIds, defaultTab);
 
   return (
     <ModulePage
       title="Usuarios"
       subtitle="Administra el equipo del salón y los permisos por rol."
-      tabs={[...USERS_MODULE_TABS]}
+      tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
       tabPanels={{
-        users: (
+        users: canManageUsers ? (
           <UsersManagementView
             showHeader={false}
             title="Usuarios"
             subtitle="Administra el equipo del salón y los permisos por rol."
             searchPlaceholder="Buscar por nombre, correo o rol..."
           />
-        ),
-        permissions: (
+        ) : null,
+        permissions: canManageRolePermissions ? (
           <RolePermissionsView
             showHeader={false}
             enabled={activeTab === 'permissions'}
           />
-        ),
+        ) : null,
       }}
     />
   );

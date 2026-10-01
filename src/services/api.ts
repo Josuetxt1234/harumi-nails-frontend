@@ -6,6 +6,7 @@ import {
   getRememberMePreference,
   saveAuthSession,
 } from '../lib/auth-storage';
+import { notifyAuthSessionExpired } from '../lib/auth-session';
 import type { LoginResponse } from '../types/auth.types';
 
 const api = axios.create({
@@ -31,11 +32,16 @@ api.interceptors.request.use((config) => {
 
 let refreshPromise: Promise<string | null> | null = null;
 
+function expireAuthSession(): void {
+  clearAuthSession();
+  notifyAuthSessionExpired();
+}
+
 async function refreshAccessToken(): Promise<string | null> {
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
-    clearAuthSession();
+    expireAuthSession();
     return null;
   }
 
@@ -83,7 +89,7 @@ api.interceptors.response.use(
     if (!refreshPromise) {
       refreshPromise = refreshAccessToken()
         .catch(() => {
-          clearAuthSession();
+          expireAuthSession();
           return null;
         })
         .finally(() => {

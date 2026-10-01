@@ -15,28 +15,3 @@ export function mapApiUserToManagedUser(user: ApiUser): ManagedUser {
     updatedAt: user.updatedAt,
   };
 }
-
-export function filterManagedUsers(
-  users: ManagedUser[],
-  search: string,
-  statusFilter: 'all' | 'active' | 'inactive',
-): ManagedUser[] {
-  const normalizedSearch = search.trim().toLowerCase();
-
-  return users.filter((user) => {
-    const matchesSearch =
-      !normalizedSearch ||
-      user.firstName.toLowerCase().includes(normalizedSearch) ||
-      user.lastName.toLowerCase().includes(normalizedSearch) ||
-      user.email.toLowerCase().includes(normalizedSearch) ||
-      user.role.toLowerCase().includes(normalizedSearch) ||
-      user.roles.some((role) => role.toLowerCase().includes(normalizedSearch));
-
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && user.isActive) ||
-      (statusFilter === 'inactive' && !user.isActive);
-
-    return matchesSearch && matchesStatus;
-  });
-}

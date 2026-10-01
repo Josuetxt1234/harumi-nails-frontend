@@ -68,7 +68,3 @@ export function clearAuthSession(): void {
   getTemporaryStorage().removeItem(ACCESS_TOKEN_KEY);
   getTemporaryStorage().removeItem(REFRESH_TOKEN_KEY);
 }
-
-export function hasStoredSession(): boolean {
-  return Boolean(getRefreshToken());
-}

@@ -7,12 +7,15 @@ import { EmptyState } from '../../components/ui/feedback/EmptyState';
 import { StatusBadge } from '../../components/ui/feedback/StatusBadge';
 import { AvatarUploadField } from '../../components/ui/form/AvatarUploadField';
 import { getRoleLabel } from '../../constants/roles.constants';
+import { PERMISSIONS } from '../../constants/permissions.constants';
 import { useAuth } from '../../context/AuthContext';
 import { getMyProfile, updateMyProfile } from '../../services/users.service';
 import type { ManagedUser } from '../../types/user.types';
 
 export function ProfilePage() {
-  const { refreshProfile } = useAuth();
+  const { refreshProfile, hasPermission } = useAuth();
+  const canUpdateProfile = hasPermission(PERMISSIONS.PROFILE_UPDATE);
+  const canChangePassword = hasPermission(PERMISSIONS.PROFILE_CHANGE_PASSWORD);
   const [profile, setProfile] = useState<ManagedUser | null>(null);
   const [phone, setPhone] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -82,6 +85,10 @@ export function ProfilePage() {
 
   const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!canUpdateProfile) {
+      return;
+    }
     setIsSaving(true);
     setErrorMessage('');
     setSuccessMessage('');
@@ -175,7 +182,9 @@ export function ProfilePage() {
             Contact & Avatar
           </h2>
           <p className="mt-1 text-sm text-slate-body">
-            Update your phone number and profile photo.
+            {canUpdateProfile
+              ? 'Update your phone number and profile photo.'
+              : 'You can view your contact details. You do not have permission to update them.'}
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleProfileSubmit}>
@@ -189,6 +198,7 @@ export function ProfilePage() {
               lastName={profile.lastName}
               previewUrl={avatarPreview}
               onChange={handleAvatarChange}
+              disabled={!canUpdateProfile}
             />
 
             <div className="space-y-2">
@@ -199,33 +209,38 @@ export function ProfilePage() {
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
                 placeholder="0991234567"
-                className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+                disabled={!canUpdateProfile}
+                className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-slate-50 disabled:text-slate-muted"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-70"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
+            {canUpdateProfile ? (
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-70"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            ) : null}
           </form>
         </section>
       </div>
 
-      <section className="mt-6 rounded-[28px] border border-slate-border bg-white p-6 shadow-sm">
-        <h2 className="font-outfit text-xl font-bold text-slate-heading">
-          Security
-        </h2>
-        <p className="mt-1 text-sm text-slate-body">
-          Change your password using your current credentials.
-        </p>
+      {canChangePassword ? (
+        <section className="mt-6 rounded-[28px] border border-slate-border bg-white p-6 shadow-sm">
+          <h2 className="font-outfit text-xl font-bold text-slate-heading">
+            Security
+          </h2>
+          <p className="mt-1 text-sm text-slate-body">
+            Change your password using your current credentials.
+          </p>
 
-        <div className="mt-6 max-w-md">
-          <ChangePasswordForm />
-        </div>
-      </section>
+          <div className="mt-6 max-w-md">
+            <ChangePasswordForm />
+          </div>
+        </section>
+      ) : null}
     </ProfileShell>
   );
 }

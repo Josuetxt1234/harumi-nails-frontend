@@ -1,6 +1,7 @@
 import { LogOut, LucideIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { canAccessNavItem } from '../../../lib/navigation-access';
 import { UserAvatar } from '../display/UserAvatar';
 import type { DashboardShellConfig, NavItem } from '../../../constants/navigation.constants';
 
@@ -41,6 +42,9 @@ function MesaSidebar({
   sessionLabel?: string;
 }) {
   const { user, logout } = useAuth();
+  const visibleNavItems = navItems.filter((item) =>
+    canAccessNavItem(item, user?.permissions),
+  );
 
   return (
     <aside className="flex h-screen w-72 shrink-0 flex-col border-r border-slate-border bg-white px-5 py-6">
@@ -74,7 +78,7 @@ function MesaSidebar({
       ) : null}
 
       <nav className="space-y-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
 
           if (!item.enabled) {

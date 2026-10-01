@@ -15,7 +15,7 @@ export function GuestRoute() {
 
   if (isAuthenticated && user) {
     return (
-      <Navigate to={getDefaultRouteForRoles(user.roles)} replace />
+      <Navigate to={getDefaultRouteForRoles(user.roles, user.permissions)} replace />
     );
   }
 

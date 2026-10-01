@@ -49,6 +49,7 @@ export const SUPER_ADMIN_SHELL: DashboardShellConfig = {
       path: '/dashboard/users',
       icon: Users,
       enabled: true,
+      requiredAnyPermission: [PERMISSIONS.USERS_LIST],
     },
     {
       label: 'Registro diario',
@@ -88,6 +89,7 @@ export const ADMIN_SHELL: DashboardShellConfig = {
       path: '/admin/staff',
       icon: Users,
       enabled: true,
+      requiredAnyPermission: [PERMISSIONS.USERS_LIST],
     },
     {
       label: 'Registro diario',
@@ -116,6 +118,7 @@ export const MESA_SHELL: DashboardShellConfig = {
       path: '/profile',
       icon: UserCircle2,
       enabled: true,
+      requiredAnyPermission: [PERMISSIONS.PROFILE_READ],
     },
   ],
 };

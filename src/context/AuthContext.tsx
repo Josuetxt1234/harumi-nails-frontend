@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   getCurrentUser,
   login as loginRequest,
@@ -14,6 +15,7 @@ import {
   restoreSession,
 } from '../services/auth.service';
 import type { AuthUser, LoginPayload } from '../types/auth.types';
+import { subscribeAuthSessionExpired } from '../lib/auth-session';
 import {
   hasAllPermissions,
   hasAnyPermission,
@@ -35,8 +37,18 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    return subscribeAuthSessionExpired(() => {
+      setUser(null);
+      if (window.location.pathname !== '/login') {
+        navigate('/login', { replace: true });
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     let isMounted = true;

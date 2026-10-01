@@ -9,6 +9,7 @@ interface AvatarUploadFieldProps {
   onChange: (file: File | null) => void;
   size?: 'md' | 'lg';
   helperText?: string;
+  disabled?: boolean;
 }
 
 export function AvatarUploadField({
@@ -18,6 +19,7 @@ export function AvatarUploadField({
   onChange,
   size = 'lg',
   helperText = 'JPG, PNG or WEBP. Max 5MB.',
+  disabled = false,
 }: AvatarUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarSize = size === 'lg' ? 'lg' : 'md';
@@ -31,14 +33,16 @@ export function AvatarUploadField({
           avatarUrl={previewUrl}
           size={avatarSize}
         />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white shadow-sm transition hover:bg-brand-dark"
-          aria-label="Upload avatar"
-        >
-          <Camera className="h-4 w-4" />
-        </button>
+        {disabled ? null : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white shadow-sm transition hover:bg-brand-dark"
+            aria-label="Upload avatar"
+          >
+            <Camera className="h-4 w-4" />
+          </button>
+        )}
       </div>
       <div className="text-center">
         <p className="text-sm font-semibold text-slate-heading">Profile photo</p>
@@ -49,6 +53,7 @@ export function AvatarUploadField({
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="hidden"
+        disabled={disabled}
         onChange={(event) => onChange(event.target.files?.[0] ?? null)}
       />
     </div>

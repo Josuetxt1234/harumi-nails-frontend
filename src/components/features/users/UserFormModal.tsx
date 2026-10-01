@@ -11,6 +11,7 @@ import type {
 import { AlertBanner } from '../../ui/feedback/AlertBanner';
 import { AvatarUploadField } from '../../ui/form/AvatarUploadField';
 import { ToggleSwitch } from '../../ui/form/ToggleSwitch';
+import { PasswordInput } from '../../ui/form/PasswordInput';
 import { Modal } from '../../ui/overlay/Modal';
 
 interface UserFormModalProps {
@@ -304,8 +305,7 @@ export function UserFormModal({
               </button>
             ) : null}
           </div>
-          <input
-            type="text"
+          <PasswordInput
             name="user-password"
             value={form.password}
             onChange={(event) =>
@@ -318,7 +318,6 @@ export function UserFormModal({
               mode === 'create' ? 'Minimo 8 caracteres' : 'Leave blank to keep current'
             }
             autoComplete="new-password"
-            className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
             required={mode === 'create'}
             minLength={mode === 'create' ? 8 : undefined}
           />

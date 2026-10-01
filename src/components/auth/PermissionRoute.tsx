@@ -1,10 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { SYSTEM_ROLES } from '../../constants/roles.constants';
 import { useAuth } from '../../context/AuthContext';
 import { getDefaultRouteForRoles } from '../../lib/get-default-route';
 
-export function SuperAdminRoute() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+interface PermissionRouteProps {
+  anyOf: string[];
+}
+
+export function PermissionRoute({ anyOf }: PermissionRouteProps) {
+  const { user, isAuthenticated, isLoading, hasAnyPermission } = useAuth();
 
   if (isLoading) {
     return (
@@ -18,8 +21,13 @@ export function SuperAdminRoute() {
     return <Navigate to="/login" replace />;
   }
 
-  if (!user?.roles?.includes(SYSTEM_ROLES.SUPER_ADMIN)) {
-    return <Navigate to={getDefaultRouteForRoles(user?.roles ?? [], user?.permissions)} replace />;
+  if (!hasAnyPermission(anyOf)) {
+    return (
+      <Navigate
+        to={getDefaultRouteForRoles(user?.roles ?? [], user?.permissions)}
+        replace
+      />
+    );
   }
 
   return <Outlet />;

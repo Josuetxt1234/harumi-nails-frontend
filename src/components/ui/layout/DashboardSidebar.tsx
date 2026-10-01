@@ -20,7 +20,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const { user, logout } = useAuth();
   const visibleNavItems = navItems.filter((item) =>
-    canAccessNavItem(item, user?.roles ?? [], user?.permissions),
+    canAccessNavItem(item, user?.permissions),
   );
 
   return (
