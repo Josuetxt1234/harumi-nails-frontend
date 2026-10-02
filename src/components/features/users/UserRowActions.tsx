@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PERMISSIONS } from '../../../constants/permissions.constants';
 import { useAuth } from '../../../context/AuthContext';
 import type { ManagedUser } from '../../../types/user.types';
+import { useTranslation } from 'react-i18next';
 
 interface UserRowActionsProps {
   user: ManagedUser;
@@ -28,6 +29,7 @@ export function UserRowActions({
   onToggleStatus,
   onDelete,
 }: UserRowActionsProps) {
+  const { t } = useTranslation();
   const { hasPermission } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,8 +75,8 @@ export function UserRowActions({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-border text-slate-body transition hover:border-brand hover:text-brand"
-        aria-label="Open user actions"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-border text-slate-body transition hover:border-brand hover:text-brand"
+        aria-label={t('users:actions_aria')}
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
@@ -88,7 +90,7 @@ export function UserRowActions({
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-heading transition hover:bg-slate-50"
             >
               <Pencil className="h-4 w-4" />
-              Edit
+              {t('common:edit')}
             </button>
           ) : null}
           {canChangePassword ? (
@@ -98,7 +100,7 @@ export function UserRowActions({
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-heading transition hover:bg-slate-50"
             >
               <KeyRound className="h-4 w-4" />
-              Change Password
+              {t('users:change_password')}
             </button>
           ) : null}
           {canToggleStatus ? (
@@ -110,12 +112,12 @@ export function UserRowActions({
               {user.isActive ? (
                 <>
                   <Ban className="h-4 w-4 text-orange-500" />
-                  Suspend
+                  {t('users:suspend')}
                 </>
               ) : (
                 <>
                   <UserCheck className="h-4 w-4 text-emerald-500" />
-                  Activate
+                  {t('users:activate')}
                 </>
               )}
             </button>
@@ -127,7 +129,7 @@ export function UserRowActions({
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-red-500 transition hover:bg-red-50"
             >
               <Trash2 className="h-4 w-4" />
-              Delete
+              {t('common:delete')}
             </button>
           ) : null}
         </div>

@@ -1,4 +1,5 @@
 import { getApiErrorMessage } from '../lib/get-api-error';
+import i18n from '../i18n';
 import { mapApiUserToManagedUser } from '../lib/user-mapper';
 import type {
   ApiUser,
@@ -19,7 +20,7 @@ async function resolveRoleId(roleName: string): Promise<string> {
   const role = roles.find((item) => item.name === roleName);
 
   if (!role) {
-    throw new Error(`Role "${roleName}" was not found.`);
+    throw new Error(i18n.t('errors:role_not_found', { role: roleName }));
   }
 
   return role.id;
@@ -55,10 +56,6 @@ function buildUpdateFormData(input: UpdateUserInput): FormData {
 
   if (input.phone !== undefined) {
     formData.append('phone', input.phone.trim());
-  }
-
-  if (input.password?.trim()) {
-    formData.append('password', input.password);
   }
 
   if (input.avatarFile) {
@@ -126,7 +123,7 @@ export async function createUser(input: CreateUserInput): Promise<ManagedUser> {
     const { data } = await api.post<ApiUser>('/users', formData);
     return mapApiUserToManagedUser(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to create user.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_create'));
   }
 }
 
@@ -170,7 +167,7 @@ export async function updateUser(
 
     return updatedUser;
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to update user.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_update'));
   }
 }
 
@@ -179,7 +176,7 @@ export async function activateUser(userId: string): Promise<ManagedUser> {
     const { data } = await api.patch<ApiUser>(`/users/${userId}/activate`);
     return mapApiUserToManagedUser(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to activate user.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_activate'));
   }
 }
 
@@ -188,7 +185,7 @@ export async function deactivateUser(userId: string): Promise<ManagedUser> {
     const { data } = await api.patch<ApiUser>(`/users/${userId}/deactivate`);
     return mapApiUserToManagedUser(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to deactivate user.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_deactivate'));
   }
 }
 
@@ -196,7 +193,7 @@ export async function deleteUser(userId: string): Promise<void> {
   try {
     await api.delete(`/users/${userId}`);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to delete user.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_delete'));
   }
 }
 
@@ -207,7 +204,7 @@ export async function changeUserPassword(
   try {
     await api.patch(`/users/${userId}/password`, { newPassword });
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to change password.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_password'));
   }
 }
 
@@ -216,7 +213,7 @@ export async function getMyProfile(): Promise<ManagedUser> {
     const { data } = await api.get<ApiUser>('/users/me');
     return mapApiUserToManagedUser(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to load profile.'));
+    throw new Error(getApiErrorMessage(error, 'errors:profile_load'));
   }
 }
 
@@ -228,7 +225,7 @@ export async function updateMyProfile(
     const { data } = await api.patch<ApiUser>('/users/me', formData);
     return mapApiUserToManagedUser(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to update profile.'));
+    throw new Error(getApiErrorMessage(error, 'errors:profile_update'));
   }
 }
 
@@ -238,6 +235,6 @@ export async function changeMyPassword(
   try {
     await api.patch('/users/me/password', input);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, 'Unable to change password.'));
+    throw new Error(getApiErrorMessage(error, 'errors:users_password'));
   }
 }

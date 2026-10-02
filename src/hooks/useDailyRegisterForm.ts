@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { SYSTEM_ROLES } from '../constants/roles.constants';
+import i18n from '../i18n';
 import { calculateRegisterTotals } from '../lib/calculate-register-totals';
 import { getApiErrorMessage } from '../lib/get-api-error';
-import {
-  createDailyRegister,
-  listMesaUsers,
-  listSalonServices,
-} from '../services/daily-register.service';
+import { formatMoney } from '../lib/money';
+import { parseDecimalInput } from '../lib/parse-decimal-input';
+import { createDailyRegister, listMesaUsers } from '../services/daily-register.service';
+import { getServices } from '../services/services.service';
 import type {
   CartItem,
   MesaUserOption,
@@ -13,14 +15,48 @@ import type {
   SalonService,
 } from '../types/daily-register.types';
 
-export interface UseDailyRegisterFormOptions {
-  requireMesaSelection?: boolean;
+async function loadActiveCatalog(): Promise<SalonService[]> {
+  const firstPage = await getServices({
+    isActive: true,
+    page: 1,
+    limit: 100,
+  });
+
+  if (firstPage.totalPages <= 1) {
+    return firstPage.services;
+  }
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      getServices({
+        isActive: true,
+        page: index + 2,
+        limit: 100,
+      }),
+    ),
+  );
+
+  return [
+    ...firstPage.services,
+    ...remainingPages.flatMap((page) => page.services),
+  ];
 }
 
-export function useDailyRegisterForm(
-  options: UseDailyRegisterFormOptions = {},
-) {
-  const requireMesaSelection = options.requireMesaSelection ?? false;
+export interface UseDailyRegisterFormOptions {
+  onRegistered?: () => void;
+}
+
+export function useDailyRegisterForm({
+  onRegistered,
+}: UseDailyRegisterFormOptions = {}) {
+  const { user } = useAuth();
+  const isElevated = Boolean(
+    user?.roles.includes(SYSTEM_ROLES.ADMIN) ||
+      user?.roles.includes(SYSTEM_ROLES.SUPER_ADMIN),
+  );
+  const lockedMesaLabel = user
+    ? `${user.firstName} ${user.lastName}`.trim()
+    : i18n.t('pos:your_account');
 
   const [services, setServices] = useState<SalonService[]>([]);
   const [mesaUsers, setMesaUsers] = useState<MesaUserOption[]>([]);
@@ -29,8 +65,7 @@ export function useDailyRegisterForm(
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('all');
   const [clientName, setClientName] = useState('');
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [hasCardFee, setHasCardFee] = useState(false);
+  const [discountInput, setDiscountInput] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH');
   const [isLoadingServices, setIsLoadingServices] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,15 +80,10 @@ export function useDailyRegisterForm(
       setErrorMessage('');
 
       try {
-        const requests: [
-          Promise<SalonService[]>,
-          Promise<MesaUserOption[] | null>,
-        ] = [
-          listSalonServices(),
-          requireMesaSelection ? listMesaUsers() : Promise.resolve(null),
-        ];
-
-        const [servicesData, mesaUsersData] = await Promise.all(requests);
+        const [servicesData, mesaUsersData] = await Promise.all([
+          loadActiveCatalog(),
+          isElevated ? listMesaUsers() : Promise.resolve(null),
+        ]);
 
         if (!isMounted) {
           return;
@@ -68,7 +98,7 @@ export function useDailyRegisterForm(
       } catch (error) {
         if (isMounted) {
           setErrorMessage(
-            getApiErrorMessage(error, 'No se pudo cargar el catálogo de servicios.'),
+            getApiErrorMessage(error, 'errors:services_load'),
           );
         }
       } finally {
@@ -78,16 +108,18 @@ export function useDailyRegisterForm(
       }
     }
 
-    loadInitialData();
+    void loadInitialData();
 
     return () => {
       isMounted = false;
     };
-  }, [requireMesaSelection]);
+  }, [isElevated]);
 
   const categories = useMemo(() => {
-    const unique = Array.from(new Set(services.map((service) => service.category)));
-    return unique.sort((left, right) => left.localeCompare(right));
+    const unique = Array.from(
+      new Set(services.map((service) => service.category)),
+    );
+    return unique.sort((left, right) => left.localeCompare(right, 'es'));
   }, [services]);
 
   const filteredServices = useMemo(() => {
@@ -105,9 +137,18 @@ export function useDailyRegisterForm(
     });
   }, [services, search, category]);
 
+  const discountAmount = parseDecimalInput(discountInput) ?? 0;
+  const applyCardFee = paymentMethod === 'CARD';
+
   const totals = useMemo(
-    () => calculateRegisterTotals(cart, discountAmount, hasCardFee),
-    [cart, discountAmount, hasCardFee],
+    () =>
+      calculateRegisterTotals(
+        cart,
+        discountAmount,
+        paymentMethod,
+        applyCardFee,
+      ),
+    [cart, discountAmount, paymentMethod, applyCardFee],
   );
 
   const addService = useCallback((service: SalonService) => {
@@ -158,29 +199,32 @@ export function useDailyRegisterForm(
   const resetForm = useCallback(() => {
     setCart([]);
     setClientName('');
-    setDiscountAmount(0);
-    setHasCardFee(false);
+    setDiscountInput('');
     setPaymentMethod('CASH');
   }, []);
 
+  const handlePaymentMethodChange = useCallback((method: PaymentMethod) => {
+    setPaymentMethod(method);
+  }, []);
+
   const submit = useCallback(async () => {
-    if (requireMesaSelection && !selectedMesaUserId) {
-      setErrorMessage('Selecciona la mesa / manicurista.');
+    if (isElevated && !selectedMesaUserId) {
+      setErrorMessage(i18n.t('errors:pos_select_mesa'));
       return;
     }
 
     if (!clientName.trim()) {
-      setErrorMessage('Ingresa el nombre del cliente.');
+      setErrorMessage(i18n.t('errors:pos_client_required'));
       return;
     }
 
     if (cart.length === 0) {
-      setErrorMessage('Agrega al menos un servicio al registro.');
+      setErrorMessage(i18n.t('errors:pos_services_required'));
       return;
     }
 
     if (discountAmount > totals.subtotalBase) {
-      setErrorMessage('El descuento no puede superar el subtotal base.');
+      setErrorMessage(i18n.t('errors:pos_discount_invalid'));
       return;
     }
 
@@ -190,11 +234,11 @@ export function useDailyRegisterForm(
 
     try {
       const register = await createDailyRegister({
-        ...(requireMesaSelection ? { mesaUserId: selectedMesaUserId } : {}),
+        ...(isElevated ? { mesaUserId: selectedMesaUserId } : {}),
         clientName: clientName.trim(),
         paymentMethod,
         discountAmount: totals.discountAmount,
-        hasCardFee,
+        hasCardFee: applyCardFee,
         items: cart.map((item) => ({
           serviceId: item.serviceId,
           quantity: item.quantity,
@@ -203,22 +247,27 @@ export function useDailyRegisterForm(
 
       resetForm();
       setSuccessMessage(
-        `Registro guardado para ${register.clientName}. Comisión: $${register.totalCommission.toFixed(2)}.`,
+        i18n.t('pos:saved', {
+          client: register.clientName,
+          commission: formatMoney(register.totalCommission),
+        }),
       );
+      onRegistered?.();
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, 'No se pudo registrar el trabajo diario.'),
+        getApiErrorMessage(error, 'errors:pos_register'),
       );
     } finally {
       setIsSubmitting(false);
     }
   }, [
+    applyCardFee,
     cart,
     clientName,
     discountAmount,
-    hasCardFee,
+    isElevated,
+    onRegistered,
     paymentMethod,
-    requireMesaSelection,
     resetForm,
     selectedMesaUserId,
     totals.discountAmount,
@@ -226,6 +275,8 @@ export function useDailyRegisterForm(
   ]);
 
   return {
+    isElevated,
+    lockedMesaLabel,
     services: filteredServices,
     categories,
     mesaUsers,
@@ -238,12 +289,10 @@ export function useDailyRegisterForm(
     setCategory,
     clientName,
     setClientName,
-    discountAmount,
-    setDiscountAmount,
-    hasCardFee,
-    setHasCardFee,
+    discountInput,
+    setDiscountInput,
     paymentMethod,
-    setPaymentMethod,
+    setPaymentMethod: handlePaymentMethodChange,
     totals,
     isLoadingServices,
     isSubmitting,

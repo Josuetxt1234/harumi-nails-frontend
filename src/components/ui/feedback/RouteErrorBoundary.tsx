@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import i18n from '../../../i18n';
 
 interface RouteErrorBoundaryProps {
   children: ReactNode;
@@ -45,11 +46,10 @@ export class RouteErrorBoundary extends Component<
       return (
         <div className="flex min-h-[320px] flex-1 flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-border bg-white p-10 text-center">
           <h2 className="font-outfit text-xl font-bold text-slate-heading">
-            No se pudo cargar esta pantalla
+            {i18n.t('common:screen_error_title')}
           </h2>
           <p className="mt-2 max-w-md text-sm text-slate-body">
-            Ocurrió un error al mostrar el contenido. Puedes reintentar o
-            recargar la página.
+            {i18n.t('common:screen_error_body')}
           </p>
           {import.meta.env.DEV && this.state.error ? (
             <p className="mt-3 max-w-lg break-words text-xs text-red-500">
@@ -62,14 +62,14 @@ export class RouteErrorBoundary extends Component<
               onClick={this.handleRetry}
               className="rounded-xl border border-slate-border px-5 py-3 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
             >
-              Reintentar
+              {i18n.t('common:retry')}
             </button>
             <button
               type="button"
               onClick={() => window.location.reload()}
               className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
             >
-              Recargar página
+              {i18n.t('common:reload')}
             </button>
           </div>
         </div>

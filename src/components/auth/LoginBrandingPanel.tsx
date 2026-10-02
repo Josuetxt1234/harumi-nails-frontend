@@ -1,7 +1,9 @@
 import { Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import coverImage from '../../assets/images/UnasPortada.jpg';
 
 export function LoginBrandingPanel() {
+  const { t } = useTranslation('auth');
   return (
     <aside className="relative hidden min-h-screen w-full overflow-hidden lg:flex lg:w-1/2">
       <img
@@ -25,7 +27,7 @@ export function LoginBrandingPanel() {
       </header>
 
       <footer className="absolute bottom-8 left-0 right-0 z-10 px-10 text-center text-xs font-light text-white/90">
-        © 2026 Harumi Nails Beauty Center. Todos los derechos reservados.
+        {t('copyright')}
       </footer>
     </aside>
   );

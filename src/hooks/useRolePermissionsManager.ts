@@ -1,5 +1,6 @@
-import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import i18n from '../i18n';
+import { getApiErrorMessage } from '../lib/get-api-error';
 import { getPermissions } from '../services/permissions.service';
 import {
   assignPermissionToRole,
@@ -9,22 +10,6 @@ import {
 } from '../services/roles.service';
 import type { PermissionSummary } from '../types/permission.types';
 import type { RoleOption } from '../types/user.types';
-
-function getErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof AxiosError) {
-    const message = error.response?.data?.message;
-
-    if (typeof message === 'string') {
-      return message;
-    }
-
-    if (Array.isArray(message) && message.length > 0) {
-      return String(message[0]);
-    }
-  }
-
-  return fallback;
-}
 
 interface UseRolePermissionsManagerOptions {
   enabled?: boolean;
@@ -71,7 +56,7 @@ export function useRolePermissionsManager(
       setAllPermissions(permissionsResponse);
       setSelectedRoleId((currentRoleId) => currentRoleId ?? sortedRoles[0]?.id ?? null);
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, 'Unable to load roles and permissions.'));
+      setErrorMessage(getApiErrorMessage(error, 'errors:roles_load'));
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +75,7 @@ export function useRolePermissionsManager(
       setAssignedPermissionIds(new Set(rolePermissions.map((item) => item.id)));
     } catch (error) {
       setAssignedPermissionIds(new Set());
-      setErrorMessage(getErrorMessage(error, 'Unable to load role permissions.'));
+      setErrorMessage(getApiErrorMessage(error, 'errors:roles_permissions_load'));
     } finally {
       setIsRolePermissionsLoading(false);
     }
@@ -177,11 +162,11 @@ export function useRolePermissionsManager(
           await revokePermissionFromRole(selectedRoleId, permissionId);
         }
 
-        setSuccessMessage('Role permissions updated.');
+        setSuccessMessage(i18n.t('notifications:permissions_updated'));
         return true;
       } catch (error) {
         setAssignedPermissionIds(previousAssignments);
-        setErrorMessage(getErrorMessage(error, 'Unable to update role permissions.'));
+        setErrorMessage(getApiErrorMessage(error, 'errors:roles_permissions_update'));
         return false;
       } finally {
         setTogglingPermissionId(null);

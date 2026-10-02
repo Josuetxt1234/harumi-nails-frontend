@@ -1,5 +1,10 @@
 import { Plus } from 'lucide-react';
-import { ROLE_OPTIONS, SystemRole } from '../../../constants/roles.constants';
+import { useTranslation } from 'react-i18next';
+import {
+  ROLE_OPTIONS,
+  SystemRole,
+  getRoleLabel,
+} from '../../../constants/roles.constants';
 
 interface UsersToolbarProps {
   statusFilter: 'all' | 'active' | 'inactive';
@@ -20,10 +25,11 @@ export function UsersToolbar({
   onRoleFilterChange,
   onCreateClick,
   showRoleFilter = true,
-  createLabel = 'Create User',
-  listTitle = 'User List',
+  createLabel,
+  listTitle,
   showCreateButton = true,
 }: UsersToolbarProps) {
+  const { t } = useTranslation('users');
   const roleFilterOptions = ROLE_OPTIONS.filter(
     (option) => option.value !== 'SUPER_ADMIN',
   );
@@ -32,7 +38,7 @@ export function UsersToolbar({
     <div className="mb-6 flex shrink-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <p className="font-outfit text-lg font-semibold text-slate-heading">
-          {listTitle}
+          {listTitle ?? t('list_title')}
         </p>
       </div>
 
@@ -45,10 +51,10 @@ export function UsersToolbar({
             }
             className="rounded-xl border border-slate-border bg-white px-4 py-3 text-sm text-slate-heading outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           >
-            <option value="all">All roles</option>
+            <option value="all">{t('all_roles')}</option>
             {roleFilterOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {getRoleLabel(option.value)}
               </option>
             ))}
           </select>
@@ -63,19 +69,19 @@ export function UsersToolbar({
           }
           className="rounded-xl border border-slate-border bg-white px-4 py-3 text-sm text-slate-heading outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
         >
-          <option value="all">All statuses</option>
-          <option value="active">Active only</option>
-          <option value="inactive">Inactive only</option>
+          <option value="all">{t('all_statuses')}</option>
+          <option value="active">{t('active_only')}</option>
+          <option value="inactive">{t('inactive_only')}</option>
         </select>
 
         {showCreateButton ? (
           <button
             type="button"
             onClick={onCreateClick}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark"
           >
             <Plus className="h-4 w-4" strokeWidth={2} />
-            {createLabel}
+            {createLabel ?? t('create')}
           </button>
         ) : null}
       </div>

@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import {
   getRememberedEmail,
@@ -8,10 +9,12 @@ import {
 import { getDefaultRouteForRoles } from '../../lib/get-default-route';
 import { getApiErrorMessage } from '../../lib/get-api-error';
 import { PasswordInput } from '../ui/form/PasswordInput';
+import { LanguageSwitcher } from '../ui/navigation/LanguageSwitcher';
 
 export function LoginForm() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -39,16 +42,17 @@ export function LoginForm() {
         rememberMe,
       });
 
-        navigate(getDefaultRouteForRoles(authenticatedUser.roles, authenticatedUser.permissions), {
-        replace: true,
-      });
-    } catch (error) {
-      setErrorMessage(
-        getApiErrorMessage(
-          error,
-          'Invalid email or password. Please check your credentials and try again.',
+      navigate(
+        getDefaultRouteForRoles(
+          authenticatedUser.roles,
+          authenticatedUser.permissions,
         ),
+        {
+          replace: true,
+        },
       );
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'auth:invalid_credentials'));
     } finally {
       setIsSubmitting(false);
     }
@@ -57,10 +61,11 @@ export function LoginForm() {
   return (
     <div className="flex w-full max-w-md flex-col">
       <header className="mb-10">
-        <h2 className="text-3xl font-bold text-slate-heading">¡Hola de nuevo!</h2>
-        <p className="mt-2 text-sm text-slate-body">
-          Ingresa tus credenciales para acceder a la plataforma.
-        </p>
+        <div className="mb-6 flex justify-end">
+          <LanguageSwitcher />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-heading">{t('hello_again')}</h2>
+        <p className="mt-2 text-sm text-slate-body">{t('login_subtitle')}</p>
       </header>
 
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
@@ -75,14 +80,14 @@ export function LoginForm() {
             htmlFor="email"
             className="block text-sm font-semibold text-slate-heading"
           >
-            Correo Electrónico
+            {t('email')}
           </label>
           <input
             id="email"
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="admin@haruminails.com"
+            placeholder={t('email_placeholder')}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="w-full rounded-xl border border-slate-border bg-white px-4 py-3 text-sm text-slate-heading shadow-input outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
@@ -96,14 +101,14 @@ export function LoginForm() {
               htmlFor="password"
               className="block text-sm font-semibold text-slate-heading"
             >
-              Contraseña
+              {t('password')}
             </label>
             <a
               href="#"
               className="text-sm font-medium text-brand transition hover:text-brand-dark"
               onClick={(event) => event.preventDefault()}
             >
-              ¿Olvidé mi contraseña?
+              {t('forgot_password')}
             </a>
           </div>
 
@@ -128,7 +133,9 @@ export function LoginForm() {
             onChange={(event) => setRememberMe(event.target.checked)}
             className="h-4 w-4 rounded border-slate-border text-brand focus:ring-brand/30"
           />
-          <span className="text-sm font-medium text-slate-body">Recuérdame</span>
+          <span className="text-sm font-medium text-slate-body">
+            {t('remember_me')}
+          </span>
         </label>
 
         <button
@@ -136,12 +143,12 @@ export function LoginForm() {
           disabled={isSubmitting}
           className="w-full rounded-xl bg-brand px-4 py-3.5 text-sm font-bold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          {isSubmitting ? t('signing_in') : t('login')}
         </button>
       </form>
 
       <p className="mt-auto pt-16 text-center text-sm text-slate-body">
-        ¿Tienes problemas? Comunicate con el Administrador
+        {t('login_help')}
       </p>
     </div>
   );

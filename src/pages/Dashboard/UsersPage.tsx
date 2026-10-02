@@ -4,11 +4,10 @@ import { ModulePage } from '../../components/ui/layout/ModulePage';
 import { PERMISSIONS } from '../../constants/permissions.constants';
 import { useAuth } from '../../context/AuthContext';
 import { useModuleTab } from '../../hooks/useModuleTab';
-
-const USERS_TAB = { id: 'users', label: 'Usuarios' } as const;
-const PERMISSIONS_TAB = { id: 'permissions', label: 'Permisos' } as const;
+import { useTranslation } from 'react-i18next';
 
 export function DashboardUsersPage() {
+  const { t } = useTranslation();
   const { hasAnyPermission } = useAuth();
   const canManageUsers = hasAnyPermission([PERMISSIONS.USERS_LIST]);
   const canManageRolePermissions = hasAnyPermission([
@@ -19,17 +18,19 @@ export function DashboardUsersPage() {
   ]);
 
   const tabs = [
-    ...(canManageUsers ? [USERS_TAB] : []),
-    ...(canManageRolePermissions ? [PERMISSIONS_TAB] : []),
+    ...(canManageUsers ? [{ id: 'users', label: t('users:title') }] : []),
+    ...(canManageRolePermissions
+      ? [{ id: 'permissions', label: t('users:permissions_tab') }]
+      : []),
   ];
   const tabIds = tabs.map((tab) => tab.id);
-  const defaultTab = tabIds[0] ?? USERS_TAB.id;
+  const defaultTab = tabIds[0] ?? 'users';
   const { activeTab, setActiveTab } = useModuleTab(tabIds, defaultTab);
 
   return (
     <ModulePage
-      title="Usuarios"
-      subtitle="Administra el equipo del salón y los permisos por rol."
+      title={t('users:title')}
+      subtitle={t('users:subtitle')}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
@@ -37,9 +38,9 @@ export function DashboardUsersPage() {
         users: canManageUsers ? (
           <UsersManagementView
             showHeader={false}
-            title="Usuarios"
-            subtitle="Administra el equipo del salón y los permisos por rol."
-            searchPlaceholder="Buscar por nombre, correo o rol..."
+            title={t('users:title')}
+            subtitle={t('users:subtitle')}
+            searchPlaceholder={t('users:search_placeholder')}
           />
         ) : null,
         permissions: canManageRolePermissions ? (

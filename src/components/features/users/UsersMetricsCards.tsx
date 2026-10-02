@@ -1,4 +1,5 @@
 import { Users, UserCheck, UserX } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface UsersMetricsCardsProps {
   total: number;
@@ -11,21 +12,22 @@ export function UsersMetricsCards({
   active,
   inactive,
 }: UsersMetricsCardsProps) {
+  const { t } = useTranslation();
   const cards = [
     {
-      label: 'Total Users',
+      label: t('users:total'),
       value: total,
       icon: Users,
       accent: 'bg-brand/10 text-brand',
     },
     {
-      label: 'Active',
+      label: t('status:active'),
       value: active,
       icon: UserCheck,
       accent: 'bg-emerald-50 text-emerald-600',
     },
     {
-      label: 'Inactive',
+      label: t('status:inactive'),
       value: inactive,
       icon: UserX,
       accent: 'bg-orange-50 text-orange-600',

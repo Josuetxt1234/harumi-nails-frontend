@@ -17,6 +17,7 @@ import { UserFormModal } from './UserFormModal';
 import { UsersMetricsCards } from './UsersMetricsCards';
 import { UsersTable } from './UsersTable';
 import { UsersToolbar } from './UsersToolbar';
+import { useTranslation } from 'react-i18next';
 
 export interface UsersManagementViewProps {
   title: string;
@@ -45,6 +46,7 @@ export function UsersManagementView({
   allowedRoles,
   showHeader = true,
 }: UsersManagementViewProps) {
+  const { t } = useTranslation('users');
   const { user: authUser, refreshProfile, hasPermission } = useAuth();
   const {
     users,
@@ -161,7 +163,7 @@ export function UsersManagementView({
   const shouldShowMetrics = showMetrics && canListUsers;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex flex-1 flex-col lg:min-h-0">
       {showHeader ? (
         <PageHeader
           title={title}
@@ -185,7 +187,7 @@ export function UsersManagementView({
         </div>
       ) : null}
 
-      <section className="flex min-h-0 flex-1 flex-col rounded-[28px] border border-slate-border bg-white p-6 shadow-sm lg:p-8">
+      <section className="flex flex-1 flex-col rounded-[28px] border border-slate-border bg-white p-6 shadow-sm lg:min-h-0 lg:p-8">
         {shouldShowMetrics ? (
           <UsersMetricsCards
             total={metrics.total}
@@ -212,10 +214,10 @@ export function UsersManagementView({
           </div>
         ) : null}
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex flex-1 flex-col overflow-y-auto lg:min-h-0 lg:overflow-hidden">
+          <div className="flex-1 lg:min-h-0 lg:overflow-y-auto">
             {isLoading ? (
-              <EmptyState title="Loading users..." dashed />
+              <EmptyState title={t('users:loading')} dashed />
             ) : (
               <UsersTable
                 users={users}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SystemRole } from '../constants/roles.constants';
+import i18n from '../i18n';
 import {
   activateUser,
   changeUserPassword,
@@ -71,7 +72,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
       } catch (error) {
         if (isMounted) {
           setErrorMessage(
-            error instanceof Error ? error.message : 'Unable to load roles.',
+            error instanceof Error ? error.message : i18n.t('errors:users_roles_load'),
           );
         }
       } finally {
@@ -139,7 +140,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
 
       try {
         if (fixedRole && !roleIdMap[fixedRole]) {
-          throw new Error('Unable to load roles.');
+          throw new Error(i18n.t('errors:users_roles_load'));
         }
 
         setErrorMessage('');
@@ -149,7 +150,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
           setErrorMessage(
             error instanceof Error
               ? error.message
-              : 'Unable to load users from the server.',
+              : i18n.t('errors:users_load'),
           );
         }
       } finally {
@@ -177,7 +178,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         setErrorMessage('');
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to create user.';
+          error instanceof Error ? error.message : i18n.t('errors:users_create');
         setErrorMessage(message);
         throw new Error(message);
       }
@@ -194,7 +195,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         return updatedUser;
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to update user.';
+          error instanceof Error ? error.message : i18n.t('errors:users_update');
         setErrorMessage(message);
         throw new Error(message);
       }
@@ -223,7 +224,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         setErrorMessage(
           error instanceof Error
             ? error.message
-            : 'Unable to update user status.',
+            : i18n.t('errors:users_update'),
         );
         throw error;
       }
@@ -239,7 +240,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         setErrorMessage('');
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to delete user.';
+          error instanceof Error ? error.message : i18n.t('errors:users_delete');
         setErrorMessage(message);
         throw new Error(message);
       }
@@ -254,7 +255,7 @@ export function useUsersManager(config: UsersManagerConfig = {}) {
         setErrorMessage('');
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : 'Unable to change password.';
+          error instanceof Error ? error.message : i18n.t('errors:users_password');
         setErrorMessage(message);
         throw new Error(message);
       }

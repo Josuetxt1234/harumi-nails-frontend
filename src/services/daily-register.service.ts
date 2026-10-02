@@ -4,18 +4,8 @@ import type {
   ListDailyRegistersParams,
   MesaUserOption,
   PaginatedDailyRegisters,
-  SalonService,
 } from '../types/daily-register.types';
 import api from './api';
-
-export async function listSalonServices(
-  category?: string,
-): Promise<SalonService[]> {
-  const { data } = await api.get<SalonService[]>('/services', {
-    params: category ? { category } : undefined,
-  });
-  return data;
-}
 
 export async function listMesaUsers(): Promise<MesaUserOption[]> {
   const { data } = await api.get<MesaUserOption[]>('/daily-registers/mesa-users');
@@ -39,7 +29,9 @@ export async function listDailyRegisters(
 ): Promise<PaginatedDailyRegisters> {
   const { data } = await api.get<PaginatedDailyRegisters>('/daily-registers', {
     params: {
-      date: params?.date || undefined,
+      dateRange: params?.dateRange ?? 'TODAY',
+      startDate: params?.startDate || undefined,
+      endDate: params?.endDate || undefined,
       mesaUserId:
         params?.mesaUserId && params.mesaUserId !== 'all'
           ? params.mesaUserId

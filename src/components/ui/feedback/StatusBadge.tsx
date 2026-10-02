@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface StatusBadgeProps {
   isActive: boolean;
   activeLabel?: string;
@@ -6,9 +8,13 @@ interface StatusBadgeProps {
 
 export function StatusBadge({
   isActive,
-  activeLabel = 'Active',
-  inactiveLabel = 'Inactive',
+  activeLabel,
+  inactiveLabel,
 }: StatusBadgeProps) {
+  const { t } = useTranslation('status');
+  const resolvedActive = activeLabel ?? t('active');
+  const resolvedInactive = inactiveLabel ?? t('inactive');
+
   return (
     <span
       className={[
@@ -18,7 +24,7 @@ export function StatusBadge({
           : 'bg-orange-50 text-orange-600',
       ].join(' ')}
     >
-      {isActive ? activeLabel : inactiveLabel}
+      {isActive ? resolvedActive : resolvedInactive}
     </span>
   );
 }

@@ -9,6 +9,7 @@ import { EmptyState } from '../../ui/feedback/EmptyState';
 import { PageHeader } from '../../ui/layout/PageHeader';
 import { PermissionGroupCard } from './PermissionGroupCard';
 import { RoleSelector } from './RoleSelector';
+import { useTranslation } from 'react-i18next';
 
 export interface RolePermissionsViewProps {
   showHeader?: boolean;
@@ -19,6 +20,7 @@ export function RolePermissionsView({
   showHeader = true,
   enabled = true,
 }: RolePermissionsViewProps) {
+  const { t } = useTranslation();
   const { user, refreshProfile, hasPermission } = useAuth();
   const {
     roles,
@@ -56,12 +58,12 @@ export function RolePermissionsView({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex flex-1 flex-col lg:min-h-0">
       {showHeader ? (
         <PageHeader
-          title="Role Permissions"
-          subtitle="Assign capabilities to each role. Users inherit permissions from their assigned roles."
-          searchPlaceholder="Search permissions..."
+          title={t('roles:title')}
+          subtitle={t('roles:subtitle')}
+          searchPlaceholder={t('roles:search')}
           searchValue={search}
           onSearchChange={setSearch}
         />
@@ -73,14 +75,14 @@ export function RolePermissionsView({
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar permisos..."
+              placeholder={t('roles:search')}
               className="w-full rounded-full border border-slate-border bg-white py-3 pl-11 pr-4 text-sm text-slate-heading shadow-input outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
           </div>
         </div>
       )}
 
-      <section className="flex min-h-0 flex-1 flex-col rounded-[28px] border border-slate-border bg-white p-6 shadow-sm lg:p-8">
+      <section className="flex flex-1 flex-col rounded-[28px] border border-slate-border bg-white p-6 shadow-sm lg:min-h-0 lg:p-8">
         {errorMessage ? (
           <div className="mb-4 shrink-0">
             <AlertBanner message={errorMessage} />
@@ -94,12 +96,12 @@ export function RolePermissionsView({
         ) : null}
 
         {isLoading ? (
-          <EmptyState title="Loading roles and permissions..." dashed />
+          <EmptyState title={t('roles:loading')} dashed />
         ) : (
           <>
             <div className="mb-6 shrink-0">
               <p className="mb-3 text-sm font-semibold text-slate-heading">
-                Select role
+                {t('roles:select_role')}
               </p>
               <RoleSelector
                 roles={roles}
@@ -110,26 +112,25 @@ export function RolePermissionsView({
 
             {affectsCurrentUser ? (
               <div className="mb-4 shrink-0 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                You belong to this role. Permission changes update your session
-                immediately.
+                {t('roles:self_warning')}
               </div>
             ) : null}
 
             {!canEdit ? (
               <div className="mb-4 shrink-0 rounded-xl border border-slate-border bg-slate-50 px-4 py-3 text-sm text-slate-body">
-                You can review permissions, but only users with{' '}
-                <span className="font-mono text-xs">permissions.assign_to_role</span>{' '}
-                can modify them.
+                {t('roles:readonly', {
+                  permission: 'permissions.assign_to_role',
+                })}
               </div>
             ) : null}
 
             <div className="min-h-0 flex-1 overflow-y-auto">
               {isRolePermissionsLoading ? (
-                <EmptyState title="Loading role permissions..." dashed />
+                <EmptyState title={t('roles:loading_role')} dashed />
               ) : permissionGroups.length === 0 ? (
                 <EmptyState
-                  title="No permissions found"
-                  description="Try adjusting your search."
+                  title={t('roles:empty')}
+                  description={t('roles:empty_hint')}
                   dashed
                 />
               ) : (

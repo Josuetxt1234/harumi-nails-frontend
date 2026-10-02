@@ -1,5 +1,6 @@
 import type { PermissionGroup } from '../../../lib/group-permissions';
 import type { PermissionSummary } from '../../../types/permission.types';
+import { useTranslation } from 'react-i18next';
 
 interface PermissionGroupCardProps {
   group: PermissionGroup;
@@ -16,18 +17,23 @@ export function PermissionGroupCard({
   togglingPermissionId,
   onToggle,
 }: PermissionGroupCardProps) {
+  const { t } = useTranslation('roles');
+  const assignedCount = group.permissions.filter((permission) =>
+    assignedPermissionIds.has(permission.id),
+  ).length;
+
   return (
     <section className="rounded-2xl border border-slate-border bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h3 className="font-outfit text-base font-semibold text-slate-heading">
-            {group.label}
+            {t(`group_${group.key}`, { defaultValue: group.key })}
           </h3>
           <p className="text-xs text-slate-body">
-            {group.permissions.filter((permission) =>
-              assignedPermissionIds.has(permission.id),
-            ).length}{' '}
-            of {group.permissions.length} enabled
+            {t('enabled_count', {
+              assigned: assignedCount,
+              total: group.permissions.length,
+            })}
           </p>
         </div>
       </div>
@@ -65,6 +71,7 @@ function PermissionToggleRow({
   isLoading,
   onToggle,
 }: PermissionToggleRowProps) {
+  const { t } = useTranslation('roles');
   const actionLabel =
     permission.description?.trim() || formatPermissionLabel(permission.name);
 
@@ -93,7 +100,7 @@ function PermissionToggleRow({
             {actionLabel}
           </span>
           {isLoading ? (
-            <span className="text-xs text-brand">Saving...</span>
+            <span className="text-xs text-brand">{t('saving')}</span>
           ) : null}
         </span>
       </span>

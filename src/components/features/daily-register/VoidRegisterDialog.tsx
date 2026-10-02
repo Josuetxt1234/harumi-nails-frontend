@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '../../ui/overlay/Modal';
 
 interface VoidRegisterDialogProps {
@@ -16,18 +17,17 @@ export function VoidRegisterDialog({
   onClose,
   onConfirm,
 }: VoidRegisterDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Anular registro"
+      title={t('pos:void_title')}
       subtitle={clientName}
       icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
     >
-      <p className="mb-6 text-sm text-slate-body">
-        Esta acción realiza una anulación (soft delete). El registro dejará de
-        aparecer en los listados, pero quedará en auditoría con tu usuario.
-      </p>
+      <p className="mb-6 text-sm text-slate-body">{t('pos:void_body')}</p>
 
       <div className="flex justify-end gap-3">
         <button
@@ -36,7 +36,7 @@ export function VoidRegisterDialog({
           disabled={isSubmitting}
           className="rounded-xl border border-slate-border px-5 py-3 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
         >
-          Cancelar
+          {t('common:cancel')}
         </button>
         <button
           type="button"
@@ -44,7 +44,7 @@ export function VoidRegisterDialog({
           disabled={isSubmitting}
           className="rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-600 disabled:opacity-70"
         >
-          {isSubmitting ? 'Anulando...' : 'Anular registro'}
+          {isSubmitting ? t('pos:voiding') : t('pos:void_title')}
         </button>
       </div>
     </Modal>

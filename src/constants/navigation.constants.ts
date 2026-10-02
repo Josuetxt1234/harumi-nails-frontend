@@ -1,15 +1,13 @@
 import {
+  Banknote,
   CalendarDays,
   ClipboardList,
-  LayoutDashboard,
   LucideIcon,
-  Settings,
-  Shield,
   Sparkles,
-  UserCircle2,
   Users,
+  Wallet,
+  Warehouse,
 } from 'lucide-react';
-import { SYSTEM_ROLES } from './roles.constants';
 import { PERMISSIONS } from './permissions.constants';
 
 const DAILY_REGISTER_NAV_PERMISSIONS = [
@@ -19,122 +17,123 @@ const DAILY_REGISTER_NAV_PERMISSIONS = [
 ];
 
 export interface NavItem {
-  label: string;
+  labelKey: string;
   path: string;
   icon: LucideIcon;
-  enabled: boolean;
   requiredAnyPermission?: string[];
 }
 
 export interface DashboardShellConfig {
   brandIcon: LucideIcon;
-  brandSubtitle: string;
-  roleLabel: string;
+  brandSubtitleKey: string;
+  roleLabelKey: string;
   navItems: NavItem[];
 }
 
 export const SUPER_ADMIN_SHELL: DashboardShellConfig = {
   brandIcon: Sparkles,
-  brandSubtitle: 'Premium Salon',
-  roleLabel: 'Super Admin',
+  brandSubtitleKey: 'brand_premium',
+  roleLabelKey: 'role_super_admin',
   navItems: [
     {
-      label: 'Dashboard',
-      path: '/dashboard/overview',
-      icon: LayoutDashboard,
-      enabled: false,
-    },
-    {
-      label: 'Usuarios',
-      path: '/dashboard/users',
-      icon: Users,
-      enabled: true,
-      requiredAnyPermission: [PERMISSIONS.USERS_LIST],
-    },
-    {
-      label: 'Registro diario',
+      labelKey: 'pos',
       path: '/dashboard/registro-diario',
       icon: ClipboardList,
-      enabled: true,
       requiredAnyPermission: DAILY_REGISTER_NAV_PERMISSIONS,
     },
     {
-      label: 'Configuración',
-      path: '/dashboard/settings',
-      icon: Settings,
-      enabled: false,
+      labelKey: 'users',
+      path: '/dashboard/users',
+      icon: Users,
+      requiredAnyPermission: [PERMISSIONS.USERS_LIST],
     },
     {
-      label: 'Auditoría',
-      path: '/dashboard/audit',
-      icon: Shield,
-      enabled: false,
+      labelKey: 'services',
+      path: '/dashboard/servicios',
+      icon: Sparkles,
+      requiredAnyPermission: [PERMISSIONS.SERVICES_LIST],
+    },
+    {
+      labelKey: 'vouchers',
+      path: '/dashboard/vales',
+      icon: Wallet,
+      requiredAnyPermission: [PERMISSIONS.ADVANCES_LIST],
+    },
+    {
+      labelKey: 'payroll',
+      path: '/dashboard/nomina',
+      icon: Banknote,
+      requiredAnyPermission: [PERMISSIONS.PAYROLL_LIST, PERMISSIONS.PAYROLL_CREATE],
+    },
+    {
+      labelKey: 'inventory',
+      path: '/dashboard/inventario',
+      icon: Warehouse,
+      requiredAnyPermission: [PERMISSIONS.INVENTORY_LIST],
     },
   ],
 };
 
 export const ADMIN_SHELL: DashboardShellConfig = {
   brandIcon: CalendarDays,
-  brandSubtitle: 'Salon Admin',
-  roleLabel: 'Admin',
+  brandSubtitleKey: 'brand_admin',
+  roleLabelKey: 'role_admin',
   navItems: [
     {
-      label: 'Dashboard',
-      path: '/admin/dashboard',
-      icon: LayoutDashboard,
-      enabled: false,
+      labelKey: 'pos',
+      path: '/admin/registro-diario',
+      icon: ClipboardList,
+      requiredAnyPermission: DAILY_REGISTER_NAV_PERMISSIONS,
     },
     {
-      label: 'Staff',
+      labelKey: 'staff',
       path: '/admin/staff',
       icon: Users,
-      enabled: true,
       requiredAnyPermission: [PERMISSIONS.USERS_LIST],
     },
     {
-      label: 'Registro diario',
-      path: '/admin/registro-diario',
-      icon: ClipboardList,
-      enabled: true,
-      requiredAnyPermission: DAILY_REGISTER_NAV_PERMISSIONS,
+      labelKey: 'services',
+      path: '/admin/servicios',
+      icon: Sparkles,
+      requiredAnyPermission: [PERMISSIONS.SERVICES_LIST],
+    },
+    {
+      labelKey: 'vouchers',
+      path: '/admin/vales',
+      icon: Wallet,
+      requiredAnyPermission: [PERMISSIONS.ADVANCES_LIST],
+    },
+    {
+      labelKey: 'payroll',
+      path: '/admin/nomina',
+      icon: Banknote,
+      requiredAnyPermission: [PERMISSIONS.PAYROLL_LIST, PERMISSIONS.PAYROLL_CREATE],
+    },
+    {
+      labelKey: 'inventory',
+      path: '/admin/inventario',
+      icon: Warehouse,
+      requiredAnyPermission: [PERMISSIONS.INVENTORY_LIST],
     },
   ],
 };
 
 export const MESA_SHELL: DashboardShellConfig = {
   brandIcon: Sparkles,
-  brandSubtitle: 'Estación de trabajo',
-  roleLabel: 'Mesa',
+  brandSubtitleKey: 'brand_mesa',
+  roleLabelKey: 'role_mesa',
   navItems: [
     {
-      label: 'Registro diario',
+      labelKey: 'pos',
       path: '/mesa/registro-diario',
       icon: ClipboardList,
-      enabled: true,
       requiredAnyPermission: DAILY_REGISTER_NAV_PERMISSIONS,
     },
     {
-      label: 'Mi perfil',
-      path: '/profile',
-      icon: UserCircle2,
-      enabled: true,
-      requiredAnyPermission: [PERMISSIONS.PROFILE_READ],
+      labelKey: 'inventory',
+      path: '/mesa/inventario',
+      icon: Warehouse,
+      requiredAnyPermission: [PERMISSIONS.INVENTORY_LIST],
     },
   ],
 };
-
-export function getRoleLabelForShell(roles: string[]): string {
-  if (roles.includes(SYSTEM_ROLES.SUPER_ADMIN)) {
-    return SUPER_ADMIN_SHELL.roleLabel;
-  }
-
-  if (roles.includes(SYSTEM_ROLES.ADMIN)) {
-    return ADMIN_SHELL.roleLabel;
-  }
-
-  if (roles.includes(SYSTEM_ROLES.MESA)) {
-    return MESA_SHELL.roleLabel;
-  }
-
-  return 'Staff';
-}

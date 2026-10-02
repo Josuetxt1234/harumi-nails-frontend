@@ -28,7 +28,6 @@ export interface UpdateUserInput {
   lastName: string;
   phone?: string;
   role: string;
-  password?: string;
   isActive?: boolean;
   avatarFile?: File | null;
 }

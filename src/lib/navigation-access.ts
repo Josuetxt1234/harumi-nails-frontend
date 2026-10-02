@@ -5,10 +5,6 @@ export function canAccessNavItem(
   item: NavItem,
   permissions: string[] | undefined,
 ): boolean {
-  if (!item.enabled) {
-    return true;
-  }
-
   if (!item.requiredAnyPermission?.length) {
     return true;
   }

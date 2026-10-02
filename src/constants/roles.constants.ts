@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 export const SYSTEM_ROLES = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
@@ -6,12 +8,19 @@ export const SYSTEM_ROLES = {
 
 export type SystemRole = (typeof SYSTEM_ROLES)[keyof typeof SYSTEM_ROLES];
 
-export const ROLE_OPTIONS: { value: SystemRole; label: string }[] = [
-  { value: SYSTEM_ROLES.SUPER_ADMIN, label: 'Super Admin' },
-  { value: SYSTEM_ROLES.ADMIN, label: 'Admin' },
-  { value: SYSTEM_ROLES.MESA, label: 'Mesa' },
-];
+const ROLE_I18N_KEYS: Record<string, string> = {
+  SUPER_ADMIN: 'nav:role_super_admin',
+  ADMIN: 'nav:role_admin',
+  MESA: 'nav:role_mesa',
+};
 
 export function getRoleLabel(role: string): string {
-  return ROLE_OPTIONS.find((option) => option.value === role)?.label ?? role;
+  const key = ROLE_I18N_KEYS[role];
+  return key ? i18n.t(key) : role;
 }
+
+export const ROLE_OPTIONS: { value: SystemRole }[] = [
+  { value: SYSTEM_ROLES.SUPER_ADMIN },
+  { value: SYSTEM_ROLES.ADMIN },
+  { value: SYSTEM_ROLES.MESA },
+];

@@ -1,8 +1,10 @@
 import { ReactNode } from 'react';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { getDefaultRouteForRoles } from '../../../lib/get-default-route';
+import { LanguageSwitcher } from '../navigation/LanguageSwitcher';
 
 interface ProfileShellProps {
   children: ReactNode;
@@ -10,38 +12,42 @@ interface ProfileShellProps {
 
 export function ProfileShell({ children }: ProfileShellProps) {
   const { user, logout } = useAuth();
+  const { t } = useTranslation('nav');
+  const { t: tAuth } = useTranslation('auth');
+  const { t: tCommon } = useTranslation('common');
   const backRoute = getDefaultRouteForRoles(user?.roles ?? [], user?.permissions);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <header className="border-b border-slate-border bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
               <p className="font-outfit text-lg font-bold text-slate-heading">
-                My Profile
+                {t('profile')}
               </p>
               <p className="text-xs text-slate-body">Harumi Nails</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <LanguageSwitcher />
             <Link
               to={backRoute}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-border px-4 py-2 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-border px-4 py-2 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {tCommon('back')}
             </Link>
             <button
               type="button"
               onClick={() => logout()}
-              className="rounded-xl border border-slate-border px-4 py-2 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
+              className="min-h-[44px] rounded-xl border border-slate-border px-4 py-2 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
             >
-              Log out
+              {tAuth('logout')}
             </button>
           </div>
         </div>

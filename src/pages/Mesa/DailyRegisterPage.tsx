@@ -1,5 +1,5 @@
-import { DailyRegisterView } from '../../components/features/daily-register/DailyRegisterView';
+import { DailyRegisterContainer } from '../../components/features/daily-register/DailyRegisterContainer';
 
 export function MesaDailyRegisterPage() {
-  return <DailyRegisterView />;
+  return <DailyRegisterContainer />;
 }

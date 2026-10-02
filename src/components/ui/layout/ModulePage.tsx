@@ -23,7 +23,7 @@ export function ModulePage({
   children,
 }: ModulePageProps) {
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex flex-1 flex-col lg:min-h-0">
       <PageHeader title={title} subtitle={subtitle} />
 
       {tabs && activeTab && onTabChange ? (
@@ -37,7 +37,9 @@ export function ModulePage({
       {tabPanels && activeTab ? (
         <TabPanels activeTab={activeTab} panels={tabPanels} />
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        <div className="flex flex-1 flex-col overflow-y-auto lg:min-h-0 lg:overflow-hidden">
+          {children}
+        </div>
       )}
     </div>
   );

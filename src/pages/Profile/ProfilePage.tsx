@@ -1,4 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 import { ChangePasswordForm } from '../../components/features/profile/ChangePasswordForm';
 import { ProfileShell } from '../../components/ui/layout/ProfileShell';
 import { UserAvatar } from '../../components/ui/display/UserAvatar';
@@ -9,10 +11,12 @@ import { AvatarUploadField } from '../../components/ui/form/AvatarUploadField';
 import { getRoleLabel } from '../../constants/roles.constants';
 import { PERMISSIONS } from '../../constants/permissions.constants';
 import { useAuth } from '../../context/AuthContext';
+import { getApiErrorMessage } from '../../lib/get-api-error';
 import { getMyProfile, updateMyProfile } from '../../services/users.service';
 import type { ManagedUser } from '../../types/user.types';
 
 export function ProfilePage() {
+  const { t } = useTranslation();
   const { refreshProfile, hasPermission } = useAuth();
   const canUpdateProfile = hasPermission(PERMISSIONS.PROFILE_UPDATE);
   const canChangePassword = hasPermission(PERMISSIONS.PROFILE_CHANGE_PASSWORD);
@@ -43,7 +47,7 @@ export function ProfilePage() {
       } catch (error) {
         if (isMounted) {
           setErrorMessage(
-            error instanceof Error ? error.message : 'Unable to load profile.',
+            getApiErrorMessage(error, 'errors:profile_load'),
           );
         }
       } finally {
@@ -103,11 +107,9 @@ export function ProfilePage() {
       setAvatarFile(null);
       setAvatarPreview(updatedProfile.avatarUrl);
       await refreshProfile();
-      setSuccessMessage('Profile updated successfully.');
+      setSuccessMessage(i18n.t('notifications:profile_updated'));
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'Unable to update profile.',
-      );
+      setErrorMessage(getApiErrorMessage(error, 'errors:profile_update'));
     } finally {
       setIsSaving(false);
     }
@@ -116,7 +118,7 @@ export function ProfilePage() {
   if (isLoading) {
     return (
       <ProfileShell>
-        <EmptyState title="Loading profile..." dashed />
+        <EmptyState title={t('profile:loading')} dashed />
       </ProfileShell>
     );
   }
@@ -124,7 +126,7 @@ export function ProfilePage() {
   if (!profile) {
     return (
       <ProfileShell>
-        <AlertBanner message={errorMessage || 'Profile not available.'} />
+        <AlertBanner message={errorMessage || t('profile:unavailable')} />
       </ProfileShell>
     );
   }
@@ -134,10 +136,10 @@ export function ProfilePage() {
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-[28px] border border-slate-border bg-white p-6 shadow-sm">
           <h2 className="font-outfit text-xl font-bold text-slate-heading">
-            Personal Information
+            {t('profile:personal')}
           </h2>
           <p className="mt-1 text-sm text-slate-body">
-            Your account details and current status in the salon.
+            {t('profile:personal_hint')}
           </p>
 
           <div className="mt-6 space-y-4">
@@ -159,7 +161,7 @@ export function ProfilePage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-xl border border-slate-border px-4 py-3">
                 <p className="text-xs uppercase tracking-wide text-slate-body">
-                  Role
+                  {t('users:role')}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-slate-heading">
                   {getRoleLabel(profile.role)}
@@ -167,7 +169,7 @@ export function ProfilePage() {
               </div>
               <div className="rounded-xl border border-slate-border px-4 py-3">
                 <p className="text-xs uppercase tracking-wide text-slate-body">
-                  Status
+                  {t('common:status')}
                 </p>
                 <div className="mt-2">
                   <StatusBadge isActive={profile.isActive} />
@@ -179,12 +181,12 @@ export function ProfilePage() {
 
         <section className="rounded-[28px] border border-slate-border bg-white p-6 shadow-sm">
           <h2 className="font-outfit text-xl font-bold text-slate-heading">
-            Contact & Avatar
+            {t('profile:contact')}
           </h2>
           <p className="mt-1 text-sm text-slate-body">
             {canUpdateProfile
-              ? 'Update your phone number and profile photo.'
-              : 'You can view your contact details. You do not have permission to update them.'}
+              ? t('profile:contact_can_edit')
+              : t('profile:contact_readonly')}
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleProfileSubmit}>
@@ -203,12 +205,12 @@ export function ProfilePage() {
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-heading">
-                Phone
+                {t('users:phone')}
               </label>
               <input
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                placeholder="0991234567"
+                placeholder={t('users:placeholder_phone')}
                 disabled={!canUpdateProfile}
                 className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-slate-50 disabled:text-slate-muted"
               />
@@ -220,7 +222,7 @@ export function ProfilePage() {
                 disabled={isSaving}
                 className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-70"
               >
-                {isSaving ? 'Saving...' : 'Save Changes'}
+                {isSaving ? t('common:saving') : t('common:save')}
               </button>
             ) : null}
           </form>
@@ -230,10 +232,10 @@ export function ProfilePage() {
       {canChangePassword ? (
         <section className="mt-6 rounded-[28px] border border-slate-border bg-white p-6 shadow-sm">
           <h2 className="font-outfit text-xl font-bold text-slate-heading">
-            Security
+            {t('profile:security')}
           </h2>
           <p className="mt-1 text-sm text-slate-body">
-            Change your password using your current credentials.
+            {t('profile:security_hint')}
           </p>
 
           <div className="mt-6 max-w-md">

@@ -1,25 +1,29 @@
-import { Outlet, useLocation } from 'react-router-dom';
 import { MESA_SHELL } from '../../../constants/navigation.constants';
 import { useAuth } from '../../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { Outlet, useLocation } from 'react-router-dom';
 import { RouteErrorBoundary } from '../feedback/RouteErrorBoundary';
-import { MesaShell } from './MesaShell';
+import { DashboardShell } from './DashboardShell';
 import { PageContent } from './PageContent';
 
 export function MesaLayout() {
+  const { t } = useTranslation('nav');
   const { user } = useAuth();
   const location = useLocation();
   const sessionLabel = user
-    ? `Mesa — ${user.firstName} ${user.lastName}`
+    ? t('mesa_session', {
+        name: `${user.firstName} ${user.lastName}`.trim(),
+      })
     : undefined;
   const resetKey = `${location.pathname}${location.search}`;
 
   return (
-    <MesaShell config={MESA_SHELL} sessionLabel={sessionLabel}>
+    <DashboardShell config={MESA_SHELL} sessionLabel={sessionLabel}>
       <PageContent>
         <RouteErrorBoundary resetKey={resetKey}>
           <Outlet />
         </RouteErrorBoundary>
       </PageContent>
-    </MesaShell>
+    </DashboardShell>
   );
 }

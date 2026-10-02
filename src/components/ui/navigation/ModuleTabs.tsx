@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export interface ModuleTab {
   id: string;
   label: string;
@@ -10,10 +12,11 @@ interface ModuleTabsProps {
 }
 
 export function ModuleTabs({ tabs, activeTab, onTabChange }: ModuleTabsProps) {
+  const { t } = useTranslation('common');
   return (
     <div
       role="tablist"
-      aria-label="Secciones del módulo"
+      aria-label={t('module_sections')}
       className="mb-6 flex w-fit shrink-0 gap-2 rounded-2xl border border-slate-border bg-white p-1.5 shadow-sm"
     >
       {tabs.map((tab) => {

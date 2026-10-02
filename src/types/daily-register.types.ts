@@ -65,8 +65,17 @@ export interface MesaUserOption {
   lastName: string;
 }
 
+export type DateRangePreset =
+  | 'TODAY'
+  | 'YESTERDAY'
+  | 'THIS_WEEK'
+  | 'THIS_MONTH'
+  | 'CUSTOM';
+
 export interface ListDailyRegistersParams {
-  date?: string;
+  dateRange?: DateRangePreset;
+  startDate?: string;
+  endDate?: string;
   mesaUserId?: string;
   paymentMethod?: PaymentMethod | 'all';
   page?: number;
@@ -80,6 +89,9 @@ export interface PaginatedDailyRegisters {
     page: number;
     limit: number;
     totalPages: number;
+    totalPaid: number;
+    totalCommission: number;
+    servicesCount: number;
   };
 }
 

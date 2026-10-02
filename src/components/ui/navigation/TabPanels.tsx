@@ -7,7 +7,7 @@ interface TabPanelsProps {
 
 export function TabPanels({ activeTab, panels }: TabPanelsProps) {
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col">
+    <div className="relative flex flex-1 flex-col overflow-y-auto lg:min-h-0 lg:overflow-hidden">
       {Object.entries(panels).map(([tabId, panel]) => {
         const isActive = tabId === activeTab;
 
@@ -18,7 +18,7 @@ export function TabPanels({ activeTab, panels }: TabPanelsProps) {
             aria-hidden={!isActive}
             className={
               isActive
-                ? 'flex min-h-0 flex-1 flex-col'
+                ? 'flex flex-1 flex-col lg:min-h-0'
                 : 'hidden'
             }
           >

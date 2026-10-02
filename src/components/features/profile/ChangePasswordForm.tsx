@@ -1,4 +1,6 @@
 import { FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 import { changeMyPassword } from '../../../services/users.service';
 import { AlertBanner } from '../../ui/feedback/AlertBanner';
 import {
@@ -14,6 +16,7 @@ const EMPTY_VALUES: PasswordFormValues = {
 };
 
 export function ChangePasswordForm() {
+  const { t } = useTranslation();
   const [values, setValues] = useState<PasswordFormValues>(EMPTY_VALUES);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -38,10 +41,10 @@ export function ChangePasswordForm() {
         newPassword: values.newPassword,
       });
       setValues(EMPTY_VALUES);
-      setSuccessMessage('Password updated successfully.');
+      setSuccessMessage(i18n.t('notifications:password_updated'));
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : 'Unable to change password.',
+        error instanceof Error ? error.message : t('errors:users_password'),
       );
     } finally {
       setIsSubmitting(false);
@@ -66,7 +69,7 @@ export function ChangePasswordForm() {
         disabled={isSubmitting}
         className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-70"
       >
-        {isSubmitting ? 'Updating...' : 'Update Password'}
+        {isSubmitting ? t('common:saving') : t('users:update_password')}
       </button>
     </form>
   );

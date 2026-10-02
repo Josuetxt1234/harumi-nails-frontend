@@ -20,6 +20,10 @@ export function getDefaultRouteForRoles(
       return '/dashboard/registro-diario';
     }
 
+    if (hasAnyPermission(permissions, [PERMISSIONS.SERVICES_LIST])) {
+      return '/dashboard/servicios';
+    }
+
     return '/profile';
   }
 
@@ -35,6 +39,10 @@ export function getDefaultRouteForRoles(
       ])
     ) {
       return '/admin/registro-diario';
+    }
+
+    if (hasAnyPermission(permissions, [PERMISSIONS.SERVICES_LIST])) {
+      return '/admin/servicios';
     }
 
     return '/profile';

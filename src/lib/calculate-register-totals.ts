@@ -1,23 +1,24 @@
 import { CARD_FEE_RATE, toMoney } from './money';
-import type { CartItem, RegisterTotals } from '../types/daily-register.types';
+import type {
+  CartItem,
+  PaymentMethod,
+  RegisterTotals,
+} from '../types/daily-register.types';
 
 export function calculateRegisterTotals(
   items: CartItem[],
   discountAmount: number,
-  hasCardFee: boolean,
+  paymentMethod: PaymentMethod = 'CASH',
+  applyCardFee = true,
 ): RegisterTotals {
   const subtotalBase = toMoney(
-    items.reduce(
-      (sum, item) => sum + item.unitPrice * item.quantity,
-      0,
-    ),
+    items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
   );
 
   const totalCommission = toMoney(
     items.reduce(
       (sum, item) =>
-        sum +
-        item.unitPrice * item.quantity * (item.commissionRate / 100),
+        sum + item.unitPrice * item.quantity * (item.commissionRate / 100),
       0,
     ),
   );
@@ -26,7 +27,8 @@ export function calculateRegisterTotals(
     Math.min(Math.max(discountAmount, 0), subtotalBase),
   );
   const amountAfterDiscount = toMoney(subtotalBase - safeDiscount);
-  const cardFeeAmount = hasCardFee
+  const shouldApplyCardFee = paymentMethod === 'CARD' && applyCardFee;
+  const cardFeeAmount = shouldApplyCardFee
     ? toMoney(amountAfterDiscount * CARD_FEE_RATE)
     : 0;
   const totalPaid = toMoney(amountAfterDiscount + cardFeeAmount);

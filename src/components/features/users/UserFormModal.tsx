@@ -1,7 +1,8 @@
 import { RefreshCw } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
-import { ROLE_OPTIONS, SystemRole } from '../../../constants/roles.constants';
+import { ROLE_OPTIONS, SystemRole, getRoleLabel } from '../../../constants/roles.constants';
 import { generateRandomPassword } from '../../../lib/generate-password';
+import { useTranslation } from 'react-i18next';
 import type {
   CreateUserInput,
   ManagedUser,
@@ -39,6 +40,7 @@ export function UserFormModal({
   onCreate,
   onUpdate,
 }: UserFormModalProps) {
+  const { t } = useTranslation();
   const roleOptions = allowedRoles
     ? ROLE_OPTIONS.filter((option) => allowedRoles.includes(option.value))
     : ROLE_OPTIONS;
@@ -147,7 +149,6 @@ export function UserFormModal({
             lastName: form.lastName,
             phone: form.phone,
             role: form.role,
-            password: form.password || undefined,
             isActive: form.isActive,
             avatarFile,
           },
@@ -158,7 +159,7 @@ export function UserFormModal({
       onClose();
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : 'Unable to save user.',
+        error instanceof Error ? error.message : t('users:save_error'),
       );
     } finally {
       setIsSubmitting(false);
@@ -171,11 +172,9 @@ export function UserFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === 'create' ? 'Create User' : 'Edit User'}
+      title={mode === 'create' ? t('users:create_title') : t('users:edit_title')}
       subtitle={
-        mode === 'create'
-          ? 'Add a new team member to the platform.'
-          : 'Update user information, role and profile photo.'
+        mode === 'create' ? t('users:create_subtitle') : t('users:edit_subtitle')
       }
       maxWidth="lg"
     >
@@ -192,7 +191,7 @@ export function UserFormModal({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-heading">
-              First Name
+              {t('users:first_name')}
             </label>
             <input
               value={form.firstName}
@@ -202,7 +201,7 @@ export function UserFormModal({
                   firstName: event.target.value,
                 }))
               }
-              placeholder="Maria"
+              placeholder={t('users:placeholder_first')}
               autoComplete="off"
               className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
               required
@@ -210,7 +209,7 @@ export function UserFormModal({
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-slate-heading">
-              Last Name
+              {t('users:last_name')}
             </label>
             <input
               value={form.lastName}
@@ -220,7 +219,7 @@ export function UserFormModal({
                   lastName: event.target.value,
                 }))
               }
-              placeholder="Lopez"
+              placeholder={t('users:placeholder_last')}
               autoComplete="off"
               className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
               required
@@ -229,7 +228,7 @@ export function UserFormModal({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-slate-heading">Email</label>
+          <label className="text-sm font-semibold text-slate-heading">{t('auth:email')}</label>
           <input
             type="email"
             name="user-email"
@@ -237,7 +236,7 @@ export function UserFormModal({
             onChange={(event) =>
               setForm((current) => ({ ...current, email: event.target.value }))
             }
-            placeholder="ejemplo@haruminails.com"
+            placeholder={t('users:placeholder_email')}
             autoComplete="off"
             disabled={mode === 'edit'}
             className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-slate-50 disabled:text-slate-muted"
@@ -246,13 +245,13 @@ export function UserFormModal({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-slate-heading">Phone</label>
+          <label className="text-sm font-semibold text-slate-heading">{t('users:phone')}</label>
           <input
             value={form.phone}
             onChange={(event) =>
               setForm((current) => ({ ...current, phone: event.target.value }))
             }
-            placeholder="0991234567"
+            placeholder={t('users:placeholder_phone')}
             autoComplete="off"
             className="w-full rounded-xl border border-slate-border px-4 py-3 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
@@ -260,7 +259,7 @@ export function UserFormModal({
 
         {showRoleSelector ? (
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-heading">Role</label>
+            <label className="text-sm font-semibold text-slate-heading">{t('users:role')}</label>
             <select
               value={form.role}
               onChange={(event) =>
@@ -273,7 +272,7 @@ export function UserFormModal({
             >
               {roleOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {getRoleLabel(option.value)}
                 </option>
               ))}
             </select>
@@ -285,43 +284,41 @@ export function UserFormModal({
           onChange={(isActive) =>
             setForm((current) => ({ ...current, isActive }))
           }
-          label="Active account"
-          description="Inactive users cannot sign in."
+          label={t('users:active_account')}
+          description={t('users:active_account_hint')}
         />
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-slate-heading">
-              {mode === 'create' ? 'Password' : 'New Password (optional)'}
-            </label>
-            {mode === 'create' ? (
+        {mode === 'create' ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-semibold text-slate-heading">
+                {t('auth:password')}
+              </label>
               <button
                 type="button"
                 onClick={handleGeneratePassword}
                 className="inline-flex items-center gap-1 text-xs font-semibold text-brand transition hover:text-brand-dark"
               >
                 <RefreshCw className="h-3.5 w-3.5" />
-                Generate
+                {t('users:generate')}
               </button>
-            ) : null}
+            </div>
+            <PasswordInput
+              name="user-password"
+              value={form.password}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  password: event.target.value,
+                }))
+              }
+              placeholder={t('users:min_chars')}
+              autoComplete="new-password"
+              required
+              minLength={8}
+            />
           </div>
-          <PasswordInput
-            name="user-password"
-            value={form.password}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                password: event.target.value,
-              }))
-            }
-            placeholder={
-              mode === 'create' ? 'Minimo 8 caracteres' : 'Leave blank to keep current'
-            }
-            autoComplete="new-password"
-            required={mode === 'create'}
-            minLength={mode === 'create' ? 8 : undefined}
-          />
-        </div>
+        ) : null}
 
         <div className="flex justify-end gap-3 pt-2">
           <button
@@ -329,7 +326,7 @@ export function UserFormModal({
             onClick={onClose}
             className="rounded-xl border border-slate-border px-5 py-3 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
           >
-            Cancel
+            {t('common:cancel')}
           </button>
           <button
             type="submit"
@@ -337,10 +334,10 @@ export function UserFormModal({
             className="rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-dark disabled:opacity-70"
           >
             {isSubmitting
-              ? 'Saving...'
+              ? t('common:saving')
               : mode === 'create'
-                ? 'Create User'
-                : 'Save Changes'}
+                ? t('users:create')
+                : t('common:save')}
           </button>
         </div>
       </form>

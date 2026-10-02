@@ -11,12 +11,19 @@ import { PERMISSIONS } from './constants/permissions.constants';
 import { AuthProvider } from './context/AuthContext';
 import { AdminStaffPage } from './pages/Admin/StaffPage';
 import { AdminDailyRegisterPage } from './pages/Admin/DailyRegisterPage';
-import { LegacyRegistersRedirect } from './pages/Admin/LegacyRegistersRedirect';
+import { DailyRegistersHistoryPage } from './pages/Admin/RegistersHistoryPage';
 import { LoginPage } from './pages/Auth/LoginPage';
 import { DashboardRedirectPage } from './pages/DashboardRedirectPage';
 import { DashboardUsersPage } from './pages/Dashboard/UsersPage';
+import { ServicesManagementPage } from './pages/Dashboard/ServicesPage';
 import { LegacyRolePermissionsRedirect } from './pages/Dashboard/LegacyRolePermissionsRedirect';
+import { AdvancesManagementPage } from './pages/Admin/AdvancesManagementPage';
+import { InventoryManagementPage } from './pages/Admin/InventoryManagementPage';
+import { PayrollManagementPage } from './pages/Admin/PayrollManagementPage';
+import { MesaAdvancesPage } from './pages/Mesa/AdvancesPage';
 import { MesaDailyRegisterPage } from './pages/Mesa/DailyRegisterPage';
+import { MesaInventoryPage } from './pages/Mesa/InventoryPage';
+import { MesaPayrollPage } from './pages/Mesa/PayrollPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
 
 const USERS_MODULE_PERMISSIONS = [PERMISSIONS.USERS_LIST];
@@ -31,6 +38,26 @@ const DAILY_REGISTER_MODULE_PERMISSIONS = [
   PERMISSIONS.DAILY_REGISTERS_LIST,
   PERMISSIONS.SERVICES_LIST,
 ];
+const DAILY_REGISTER_HISTORY_PERMISSIONS = [
+  PERMISSIONS.DAILY_REGISTERS_LIST,
+  PERMISSIONS.DAILY_REGISTERS_CREATE,
+];
+const SERVICES_MODULE_PERMISSIONS = [PERMISSIONS.SERVICES_LIST];
+const ADVANCES_ADMIN_PERMISSIONS = [
+  PERMISSIONS.ADVANCES_LIST,
+  PERMISSIONS.ADVANCES_CREATE,
+];
+const ADVANCES_MESA_PERMISSIONS = [PERMISSIONS.ADVANCES_READ];
+const PAYROLL_ADMIN_PERMISSIONS = [
+  PERMISSIONS.PAYROLL_LIST,
+  PERMISSIONS.PAYROLL_CREATE,
+];
+const PAYROLL_MESA_PERMISSIONS = [PERMISSIONS.PAYROLL_READ];
+const INVENTORY_ADMIN_PERMISSIONS = [
+  PERMISSIONS.INVENTORY_LIST,
+  PERMISSIONS.INVENTORY_CREATE,
+];
+const INVENTORY_MESA_PERMISSIONS = [PERMISSIONS.INVENTORY_LIST];
 
 function App() {
   return (
@@ -61,23 +88,45 @@ function App() {
                   element={<AdminDailyRegisterPage />}
                 />
               </Route>
+              <Route
+                element={
+                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
+                }
+              >
+                <Route
+                  path="/dashboard/registros"
+                  element={<DailyRegistersHistoryPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />}>
+                <Route
+                  path="/dashboard/servicios"
+                  element={<ServicesManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/dashboard/vales"
+                  element={<AdvancesManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/dashboard/nomina"
+                  element={<PayrollManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/dashboard/inventario"
+                  element={<InventoryManagementPage />}
+                />
+              </Route>
             </Route>
             <Route element={<PermissionRoute anyOf={ROLES_MODULE_PERMISSIONS} />}>
               <Route
                 path="/dashboard/roles"
                 element={<LegacyRolePermissionsRedirect />}
-              />
-            </Route>
-            <Route
-              element={
-                <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
-              }
-            >
-              <Route
-                path="/dashboard/registros"
-                element={
-                  <LegacyRegistersRedirect targetPath="/dashboard/registro-diario" />
-                }
               />
             </Route>
           </Route>
@@ -97,18 +146,40 @@ function App() {
                   element={<AdminDailyRegisterPage />}
                 />
               </Route>
-            </Route>
-            <Route
-              element={
-                <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
-              }
-            >
               <Route
-                path="/admin/registros"
                 element={
-                  <LegacyRegistersRedirect targetPath="/admin/registro-diario" />
+                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
                 }
-              />
+              >
+                <Route
+                  path="/admin/registros"
+                  element={<DailyRegistersHistoryPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />}>
+                <Route
+                  path="/admin/servicios"
+                  element={<ServicesManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/admin/vales"
+                  element={<AdvancesManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/admin/nomina"
+                  element={<PayrollManagementPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />}>
+                <Route
+                  path="/admin/inventario"
+                  element={<InventoryManagementPage />}
+                />
+              </Route>
             </Route>
           </Route>
 
@@ -123,6 +194,25 @@ function App() {
                   path="/mesa/registro-diario"
                   element={<MesaDailyRegisterPage />}
                 />
+              </Route>
+              <Route
+                element={
+                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
+                }
+              >
+                <Route
+                  path="/mesa/registros"
+                  element={<DailyRegistersHistoryPage />}
+                />
+              </Route>
+              <Route element={<PermissionRoute anyOf={ADVANCES_MESA_PERMISSIONS} />}>
+                <Route path="/mesa/vales" element={<MesaAdvancesPage />} />
+              </Route>
+              <Route element={<PermissionRoute anyOf={PAYROLL_MESA_PERMISSIONS} />}>
+                <Route path="/mesa/nomina" element={<MesaPayrollPage />} />
+              </Route>
+              <Route element={<PermissionRoute anyOf={INVENTORY_MESA_PERMISSIONS} />}>
+                <Route path="/mesa/inventario" element={<MesaInventoryPage />} />
               </Route>
             </Route>
           </Route>

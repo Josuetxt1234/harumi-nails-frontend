@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from './Modal';
 
 export type ConfirmDialogType = 'deactivate' | 'activate' | 'delete';
@@ -8,32 +9,33 @@ interface ConfirmDialogProps {
   type: ConfirmDialogType;
   subjectName: string;
   isSubmitting?: boolean;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
   onClose: () => void;
   onConfirm: () => Promise<void>;
 }
 
-const COPY: Record<
+const COPY_KEYS: Record<
   ConfirmDialogType,
   { title: string; description: string; confirmLabel: string; tone: string }
 > = {
   deactivate: {
-    title: 'Suspend User',
-    description:
-      'This user will lose access to the platform until reactivated.',
-    confirmLabel: 'Suspend User',
+    title: 'suspend_title',
+    description: 'suspend_body',
+    confirmLabel: 'suspend_action',
     tone: 'bg-orange-500 hover:bg-orange-600',
   },
   activate: {
-    title: 'Activate User',
-    description: 'This user will regain access to the platform.',
-    confirmLabel: 'Activate User',
+    title: 'activate_title',
+    description: 'activate_body',
+    confirmLabel: 'activate_action',
     tone: 'bg-emerald-500 hover:bg-emerald-600',
   },
   delete: {
-    title: 'Delete User',
-    description:
-      'This action performs a soft delete. The account will be removed from active lists but preserved for audit history.',
-    confirmLabel: 'Delete User',
+    title: 'delete_title',
+    description: 'delete_body',
+    confirmLabel: 'delete_action',
     tone: 'bg-red-500 hover:bg-red-600',
   },
 };
@@ -43,20 +45,28 @@ export function ConfirmDialog({
   type,
   subjectName,
   isSubmitting = false,
+  title,
+  description,
+  confirmLabel,
   onClose,
   onConfirm,
 }: ConfirmDialogProps) {
-  const copy = COPY[type];
+  const { t } = useTranslation('confirm');
+  const { t: tCommon } = useTranslation('common');
+  const copy = COPY_KEYS[type];
+  const resolvedTitle = title ?? t(copy.title);
+  const resolvedDescription = description ?? t(copy.description);
+  const resolvedConfirmLabel = confirmLabel ?? t(copy.confirmLabel);
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={copy.title}
+      title={resolvedTitle}
       subtitle={subjectName}
       icon={<AlertTriangle className="h-5 w-5 text-orange-500" />}
     >
-      <p className="mb-6 text-sm text-slate-body">{copy.description}</p>
+      <p className="mb-6 text-sm text-slate-body">{resolvedDescription}</p>
 
       <div className="flex justify-end gap-3">
         <button
@@ -65,7 +75,7 @@ export function ConfirmDialog({
           disabled={isSubmitting}
           className="rounded-xl border border-slate-border px-5 py-3 text-sm font-semibold text-slate-heading transition hover:bg-slate-50"
         >
-          Cancel
+          {tCommon('cancel')}
         </button>
         <button
           type="button"
@@ -73,7 +83,7 @@ export function ConfirmDialog({
           disabled={isSubmitting}
           className={`rounded-xl px-5 py-3 text-sm font-bold text-white transition disabled:opacity-70 ${copy.tone}`}
         >
-          {isSubmitting ? 'Processing...' : copy.confirmLabel}
+          {isSubmitting ? tCommon('processing') : resolvedConfirmLabel}
         </button>
       </div>
     </Modal>
