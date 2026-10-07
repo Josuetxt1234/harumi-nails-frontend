@@ -12,7 +12,17 @@ import {
 import { notifyAuthSessionExpired } from '../lib/auth-session';
 import type { LoginResponse } from '../types/auth.types';
 
-const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+function resolveApiBaseUrl(raw: string | undefined): string {
+  const trimmed = (raw ?? 'http://localhost:3000/api').trim().replace(/\/+$/, '');
+
+  if (!trimmed) {
+    return 'http://localhost:3000/api';
+  }
+
+  return /\/api$/i.test(trimmed) ? trimmed : `${trimmed}/api`;
+}
+
+const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
 
 const api = axios.create({
   baseURL,
