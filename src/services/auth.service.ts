@@ -1,8 +1,12 @@
 import {
-  clearAuthSession,
-  getRefreshToken,
+  clearAccessToken,
+  setAccessToken,
+} from '../lib/access-token-store';
+import {
+  clearStoredSession,
   getRememberMePreference,
-  saveAuthSession,
+  hasStoredSession,
+  markSessionActive,
 } from '../lib/auth-storage';
 import type { AuthUser, LoginPayload, LoginResponse } from '../types/auth.types';
 import api from './api';
@@ -10,48 +14,31 @@ import api from './api';
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const { data } = await api.post<LoginResponse>('/auth/login', payload);
 
-  saveAuthSession(
-    data.accessToken,
-    data.refreshToken,
-    payload.rememberMe,
-    payload.email,
-  );
+  setAccessToken(data.accessToken);
+  markSessionActive(payload.rememberMe, payload.email);
 
   return data;
 }
 
 export async function refreshSession(): Promise<LoginResponse> {
-  const refreshToken = getRefreshToken();
+  const { data } = await api.post<LoginResponse>('/auth/refresh');
 
-  if (!refreshToken) {
-    throw new Error('No refresh token available.');
-  }
-
-  const { data } = await api.post<LoginResponse>('/auth/refresh', {
-    refreshToken,
-  });
-
-  saveAuthSession(
-    data.accessToken,
-    data.refreshToken,
-    getRememberMePreference(),
-    data.user.email,
-  );
+  setAccessToken(data.accessToken);
+  markSessionActive(getRememberMePreference(), data.user.email);
 
   return data;
 }
 
 export async function restoreSession(): Promise<LoginResponse | null> {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
+  if (!hasStoredSession()) {
     return null;
   }
 
   try {
     return await refreshSession();
   } catch {
-    clearAuthSession();
+    clearAccessToken();
+    clearStoredSession();
     return null;
   }
 }
@@ -62,15 +49,12 @@ export async function getCurrentUser(): Promise<AuthUser> {
 }
 
 export async function logout(): Promise<void> {
-  const refreshToken = getRefreshToken();
-
-  if (refreshToken) {
-    try {
-      await api.post('/auth/logout', { refreshToken });
-    } catch {
-      // Session is cleared locally even if the backend request fails.
-    }
+  try {
+    await api.post('/auth/logout');
+  } catch {
+    // Session is cleared locally even if the backend request fails.
   }
 
-  clearAuthSession();
+  clearAccessToken();
+  clearStoredSession();
 }

@@ -96,21 +96,12 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between gap-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-semibold text-slate-heading"
-            >
-              {t('password')}
-            </label>
-            <a
-              href="#"
-              className="text-sm font-medium text-brand transition hover:text-brand-dark"
-              onClick={(event) => event.preventDefault()}
-            >
-              {t('forgot_password')}
-            </a>
-          </div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-semibold text-slate-heading"
+          >
+            {t('password')}
+          </label>
 
           <PasswordInput
             id="password"
@@ -122,6 +113,8 @@ export function LoginForm() {
             className="w-full rounded-xl border border-slate-border bg-white px-4 py-3 pr-12 text-sm text-slate-heading shadow-input outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
             required
           />
+
+          <p className="text-xs text-slate-muted">{t('forgot_password_hint')}</p>
         </div>
 
         <label className="flex cursor-pointer items-center gap-3">

@@ -25,6 +25,8 @@ const EXACT_MESSAGE_KEYS: Record<string, string> = {
   'Category not found.': 'errors:category_not_found',
   'Unauthorized access.': 'errors:unauthorized',
   'This session has been revoked.': 'auth:session_expired',
+  'This session has been revoked for security reasons. Please log in again.':
+    'auth:session_expired',
   'Invalid or expired refresh token.': 'auth:session_expired',
 };
 

@@ -5,6 +5,7 @@ import { MesaRoute } from './components/auth/MesaRoute';
 import { PermissionRoute } from './components/auth/PermissionRoute';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './components/auth/SuperAdminRoute';
+import { TemporaryPasswordGate } from './components/auth/TemporaryPasswordGate';
 import { DashboardLayout } from './components/ui/layout/DashboardLayout';
 import { MesaLayout } from './components/ui/layout/MesaLayout';
 import { PERMISSIONS } from './constants/permissions.constants';
@@ -63,163 +64,225 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route element={<GuestRoute />}>
-            <Route path="/login" element={<LoginPage />} />
-          </Route>
+        <TemporaryPasswordGate>
+          <Routes>
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardRedirectPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardRedirectPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
 
-          <Route element={<SuperAdminRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route element={<PermissionRoute anyOf={USERS_MODULE_PERMISSIONS} />}>
-                <Route path="/dashboard/users" element={<DashboardUsersPage />} />
+            <Route element={<SuperAdminRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route
+                  element={<PermissionRoute anyOf={USERS_MODULE_PERMISSIONS} />}
+                >
+                  <Route
+                    path="/dashboard/users"
+                    element={<DashboardUsersPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/dashboard/registro-diario"
+                    element={<AdminDailyRegisterPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute
+                      anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS}
+                    />
+                  }
+                >
+                  <Route
+                    path="/dashboard/registros"
+                    element={<DailyRegistersHistoryPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/dashboard/servicios"
+                    element={<ServicesManagementPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/dashboard/vales"
+                    element={<AdvancesManagementPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/dashboard/nomina"
+                    element={<PayrollManagementPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/dashboard/inventario"
+                    element={<InventoryManagementPage />}
+                  />
+                </Route>
               </Route>
               <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
-                }
+                element={<PermissionRoute anyOf={ROLES_MODULE_PERMISSIONS} />}
               >
                 <Route
-                  path="/dashboard/registro-diario"
-                  element={<AdminDailyRegisterPage />}
-                />
-              </Route>
-              <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
-                }
-              >
-                <Route
-                  path="/dashboard/registros"
-                  element={<DailyRegistersHistoryPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />}>
-                <Route
-                  path="/dashboard/servicios"
-                  element={<ServicesManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />}>
-                <Route
-                  path="/dashboard/vales"
-                  element={<AdvancesManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />}>
-                <Route
-                  path="/dashboard/nomina"
-                  element={<PayrollManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />}>
-                <Route
-                  path="/dashboard/inventario"
-                  element={<InventoryManagementPage />}
+                  path="/dashboard/roles"
+                  element={<LegacyRolePermissionsRedirect />}
                 />
               </Route>
             </Route>
-            <Route element={<PermissionRoute anyOf={ROLES_MODULE_PERMISSIONS} />}>
-              <Route
-                path="/dashboard/roles"
-                element={<LegacyRolePermissionsRedirect />}
-              />
-            </Route>
-          </Route>
 
-          <Route element={<AdminRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route element={<PermissionRoute anyOf={USERS_MODULE_PERMISSIONS} />}>
-                <Route path="/admin/staff" element={<AdminStaffPage />} />
-              </Route>
-              <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
-                }
-              >
+            <Route element={<AdminRoute />}>
+              <Route element={<DashboardLayout />}>
                 <Route
-                  path="/admin/registro-diario"
-                  element={<AdminDailyRegisterPage />}
-                />
-              </Route>
-              <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
-                }
-              >
+                  element={<PermissionRoute anyOf={USERS_MODULE_PERMISSIONS} />}
+                >
+                  <Route path="/admin/staff" element={<AdminStaffPage />} />
+                </Route>
                 <Route
-                  path="/admin/registros"
-                  element={<DailyRegistersHistoryPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />}>
+                  element={
+                    <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/admin/registro-diario"
+                    element={<AdminDailyRegisterPage />}
+                  />
+                </Route>
                 <Route
-                  path="/admin/servicios"
-                  element={<ServicesManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />}>
+                  element={
+                    <PermissionRoute
+                      anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS}
+                    />
+                  }
+                >
+                  <Route
+                    path="/admin/registros"
+                    element={<DailyRegistersHistoryPage />}
+                  />
+                </Route>
                 <Route
-                  path="/admin/vales"
-                  element={<AdvancesManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />}>
+                  element={
+                    <PermissionRoute anyOf={SERVICES_MODULE_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/admin/servicios"
+                    element={<ServicesManagementPage />}
+                  />
+                </Route>
                 <Route
-                  path="/admin/nomina"
-                  element={<PayrollManagementPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />}>
+                  element={
+                    <PermissionRoute anyOf={ADVANCES_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/admin/vales"
+                    element={<AdvancesManagementPage />}
+                  />
+                </Route>
                 <Route
-                  path="/admin/inventario"
-                  element={<InventoryManagementPage />}
-                />
-              </Route>
-            </Route>
-          </Route>
-
-          <Route element={<MesaRoute />}>
-            <Route element={<MesaLayout />}>
-              <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
-                }
-              >
+                  element={
+                    <PermissionRoute anyOf={PAYROLL_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/admin/nomina"
+                    element={<PayrollManagementPage />}
+                  />
+                </Route>
                 <Route
-                  path="/mesa/registro-diario"
-                  element={<MesaDailyRegisterPage />}
-                />
-              </Route>
-              <Route
-                element={
-                  <PermissionRoute anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS} />
-                }
-              >
-                <Route
-                  path="/mesa/registros"
-                  element={<DailyRegistersHistoryPage />}
-                />
-              </Route>
-              <Route element={<PermissionRoute anyOf={ADVANCES_MESA_PERMISSIONS} />}>
-                <Route path="/mesa/vales" element={<MesaAdvancesPage />} />
-              </Route>
-              <Route element={<PermissionRoute anyOf={PAYROLL_MESA_PERMISSIONS} />}>
-                <Route path="/mesa/nomina" element={<MesaPayrollPage />} />
-              </Route>
-              <Route element={<PermissionRoute anyOf={INVENTORY_MESA_PERMISSIONS} />}>
-                <Route path="/mesa/inventario" element={<MesaInventoryPage />} />
+                  element={
+                    <PermissionRoute anyOf={INVENTORY_ADMIN_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/admin/inventario"
+                    element={<InventoryManagementPage />}
+                  />
+                </Route>
               </Route>
             </Route>
-          </Route>
 
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+            <Route element={<MesaRoute />}>
+              <Route element={<MesaLayout />}>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={DAILY_REGISTER_MODULE_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/mesa/registro-diario"
+                    element={<MesaDailyRegisterPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute
+                      anyOf={DAILY_REGISTER_HISTORY_PERMISSIONS}
+                    />
+                  }
+                >
+                  <Route
+                    path="/mesa/registros"
+                    element={<DailyRegistersHistoryPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={ADVANCES_MESA_PERMISSIONS} />
+                  }
+                >
+                  <Route path="/mesa/vales" element={<MesaAdvancesPage />} />
+                </Route>
+                <Route
+                  element={<PermissionRoute anyOf={PAYROLL_MESA_PERMISSIONS} />}
+                >
+                  <Route path="/mesa/nomina" element={<MesaPayrollPage />} />
+                </Route>
+                <Route
+                  element={
+                    <PermissionRoute anyOf={INVENTORY_MESA_PERMISSIONS} />
+                  }
+                >
+                  <Route
+                    path="/mesa/inventario"
+                    element={<MesaInventoryPage />}
+                  />
+                </Route>
+              </Route>
+            </Route>
+
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </TemporaryPasswordGate>
       </AuthProvider>
     </BrowserRouter>
   );

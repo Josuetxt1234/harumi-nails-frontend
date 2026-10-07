@@ -10,6 +10,8 @@ interface ModalProps {
   icon?: ReactNode;
   children: ReactNode;
   maxWidth?: 'md' | 'lg' | 'xl';
+  /** Set to false for mandatory flows that must not offer a way out. */
+  dismissible?: boolean;
 }
 
 const MAX_WIDTH_CLASSES = {
@@ -26,6 +28,7 @@ export function Modal({
   icon,
   children,
   maxWidth = 'md',
+  dismissible = true,
 }: ModalProps) {
   if (!isOpen || typeof document === 'undefined') {
     return null;
@@ -52,13 +55,15 @@ export function Modal({
               ) : null}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-slate-muted transition hover:bg-slate-50"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          {dismissible ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg text-slate-muted transition hover:bg-slate-50"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          ) : null}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
           {children}

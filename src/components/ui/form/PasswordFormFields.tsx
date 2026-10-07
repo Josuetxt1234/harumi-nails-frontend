@@ -15,6 +15,7 @@ interface PasswordFormFieldsProps {
   onChange: (values: PasswordFormValues) => void;
   mode: 'reset' | 'change-own';
   showGenerate?: boolean;
+  currentPasswordLabel?: string;
   newPasswordLabel?: string;
   confirmPasswordLabel?: string;
 }
@@ -24,10 +25,12 @@ export function PasswordFormFields({
   onChange,
   mode,
   showGenerate = false,
+  currentPasswordLabel,
   newPasswordLabel,
   confirmPasswordLabel,
 }: PasswordFormFieldsProps) {
   const { t } = useTranslation('users');
+  const resolvedCurrent = currentPasswordLabel ?? t('current_password');
   const resolvedNew = newPasswordLabel ?? t('new_password');
   const resolvedConfirm = confirmPasswordLabel ?? t('confirm_password');
 
@@ -49,7 +52,7 @@ export function PasswordFormFields({
       {mode === 'change-own' ? (
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-heading">
-            {t('current_password')}
+            {resolvedCurrent}
           </label>
           <PasswordInput
             value={values.currentPassword}

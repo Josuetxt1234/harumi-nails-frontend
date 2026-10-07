@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useChangeOwnPassword } from '../../../hooks/useChangeOwnPassword';
 import i18n from '../../../i18n';
-import { changeMyPassword } from '../../../services/users.service';
 import { AlertBanner } from '../../ui/feedback/AlertBanner';
 import {
   PasswordFormFields,
@@ -15,47 +15,52 @@ const EMPTY_VALUES: PasswordFormValues = {
   confirmPassword: '',
 };
 
+type Feedback = { message: string; tone: 'error' | 'success' | 'info' };
+
 export function ChangePasswordForm() {
   const { t } = useTranslation();
+  const { submit, isSubmitting } = useChangeOwnPassword();
   const [values, setValues] = useState<PasswordFormValues>(EMPTY_VALUES);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
+    setFeedback(null);
 
     const validationError = validatePasswordForm(values, 'change-own');
     if (validationError) {
-      setErrorMessage(validationError);
+      setFeedback({ message: validationError, tone: 'error' });
       return;
     }
 
-    setIsSubmitting(true);
+    const outcome = await submit({
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    });
 
-    try {
-      await changeMyPassword({
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-      });
-      setValues(EMPTY_VALUES);
-      setSuccessMessage(i18n.t('notifications:password_updated'));
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : t('errors:users_password'),
-      );
-    } finally {
-      setIsSubmitting(false);
+    if (outcome.status === 'failed') {
+      setFeedback({ message: outcome.message, tone: 'error' });
+      return;
     }
+
+    // The password changed in both remaining outcomes, so the typed values are
+    // stale either way and must not be left on screen.
+    setValues(EMPTY_VALUES);
+
+    setFeedback(
+      outcome.status === 'changed'
+        ? { message: i18n.t('notifications:password_updated'), tone: 'success' }
+        : {
+            message: i18n.t('notifications:password_updated_session_lost'),
+            tone: 'info',
+          },
+    );
   };
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      {errorMessage ? <AlertBanner message={errorMessage} /> : null}
-      {successMessage ? (
-        <AlertBanner message={successMessage} tone="success" />
+      {feedback ? (
+        <AlertBanner message={feedback.message} tone={feedback.tone} />
       ) : null}
 
       <PasswordFormFields

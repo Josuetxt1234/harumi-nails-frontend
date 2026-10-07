@@ -1,7 +1,7 @@
-const ACCESS_TOKEN_KEY = 'harumi_access_token';
-const REFRESH_TOKEN_KEY = 'harumi_refresh_token';
+const SESSION_FLAG_KEY = 'harumi_has_session';
 const REMEMBER_ME_KEY = 'harumi_remember_me';
 const REMEMBERED_EMAIL_KEY = 'harumi_remembered_email';
+const LEGACY_TOKEN_KEYS = ['harumi_access_token', 'harumi_refresh_token'];
 
 function getPersistentStorage(): Storage {
   return localStorage;
@@ -13,6 +13,12 @@ function getTemporaryStorage(): Storage {
 
 function getActiveStorage(rememberMe: boolean): Storage {
   return rememberMe ? getPersistentStorage() : getTemporaryStorage();
+}
+
+// Tokens used to be persisted by older builds; drop anything left behind.
+for (const key of LEGACY_TOKEN_KEYS) {
+  getPersistentStorage().removeItem(key);
+  getTemporaryStorage().removeItem(key);
 }
 
 export function getRememberMePreference(): boolean {
@@ -27,13 +33,12 @@ export function getRememberedEmail(): string {
   return getPersistentStorage().getItem(REMEMBERED_EMAIL_KEY) ?? '';
 }
 
-export function saveAuthSession(
-  accessToken: string,
-  refreshToken: string,
-  rememberMe: boolean,
-  email?: string,
-): void {
-  clearAuthSession();
+/**
+ * Records that a refresh cookie should exist, so the app only attempts a
+ * silent restore when there is something to restore. It holds no credentials.
+ */
+export function markSessionActive(rememberMe: boolean, email?: string): void {
+  clearStoredSession();
 
   getPersistentStorage().setItem(REMEMBER_ME_KEY, String(rememberMe));
 
@@ -43,28 +48,17 @@ export function saveAuthSession(
     getPersistentStorage().removeItem(REMEMBERED_EMAIL_KEY);
   }
 
-  const storage = getActiveStorage(rememberMe);
-  storage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  storage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  getActiveStorage(rememberMe).setItem(SESSION_FLAG_KEY, 'true');
 }
 
-export function getAccessToken(): string | null {
+export function hasStoredSession(): boolean {
   return (
-    getPersistentStorage().getItem(ACCESS_TOKEN_KEY) ??
-    getTemporaryStorage().getItem(ACCESS_TOKEN_KEY)
+    getPersistentStorage().getItem(SESSION_FLAG_KEY) === 'true' ||
+    getTemporaryStorage().getItem(SESSION_FLAG_KEY) === 'true'
   );
 }
 
-export function getRefreshToken(): string | null {
-  return (
-    getPersistentStorage().getItem(REFRESH_TOKEN_KEY) ??
-    getTemporaryStorage().getItem(REFRESH_TOKEN_KEY)
-  );
-}
-
-export function clearAuthSession(): void {
-  getPersistentStorage().removeItem(ACCESS_TOKEN_KEY);
-  getPersistentStorage().removeItem(REFRESH_TOKEN_KEY);
-  getTemporaryStorage().removeItem(ACCESS_TOKEN_KEY);
-  getTemporaryStorage().removeItem(REFRESH_TOKEN_KEY);
+export function clearStoredSession(): void {
+  getPersistentStorage().removeItem(SESSION_FLAG_KEY);
+  getTemporaryStorage().removeItem(SESSION_FLAG_KEY);
 }

@@ -55,11 +55,18 @@
     "welcome": "Welcome",
     "hello_again": "Hello again!",
     "login_subtitle": "Enter your credentials to access the platform.",
-    "forgot_password": "Forgot my password?",
+    "forgot_password_hint": "If you forgot your password, contact the Administrator",
     "signing_in": "Signing in...",
     "login_help": "Having trouble? Contact the administrator",
     "copyright": "© 2026 Harumi Nails Beauty Center. All rights reserved.",
-    "email_placeholder": "admin@haruminails.com"
+    "email_placeholder": "admin@haruminails.com",
+    "temp_password_title": "Change your temporary password",
+    "temp_password_subtitle": "For your security, set a personal password before continuing.",
+    "temp_password_description": "An administrator handed you the current password. Choose a new one that only you know to enter the system.",
+    "temp_password_submit": "Save and continue",
+    "temp_password_current_label": "Current temporary password",
+    "temp_password_new_label": "Your new password",
+    "temp_password_confirm_label": "Repeat your new password"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -316,6 +323,7 @@
     "register_voided": "Register voided successfully.",
     "profile_updated": "Profile updated successfully.",
     "password_updated": "Password updated successfully.",
+    "password_updated_session_lost": "Password updated, but we could not renew your session. Please log in again with your new password.",
     "permissions_updated": "Role permissions updated.",
     "mark_all_read": "Mark all as read",
     "inbox_empty": "No notifications",

@@ -1,16 +1,23 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import {
-  clearAuthSession,
+  clearAccessToken,
   getAccessToken,
-  getRefreshToken,
+  setAccessToken,
+} from '../lib/access-token-store';
+import {
+  clearStoredSession,
   getRememberMePreference,
-  saveAuthSession,
+  markSessionActive,
 } from '../lib/auth-storage';
 import { notifyAuthSessionExpired } from '../lib/auth-session';
 import type { LoginResponse } from '../types/auth.types';
 
+const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api',
+  baseURL,
+  // Required so the HttpOnly refresh cookie travels with /auth requests.
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -33,36 +40,26 @@ api.interceptors.request.use((config) => {
 let refreshPromise: Promise<string | null> | null = null;
 
 function expireAuthSession(): void {
-  clearAuthSession();
+  clearAccessToken();
+  clearStoredSession();
   notifyAuthSessionExpired();
 }
 
 async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
-    expireAuthSession();
-    return null;
-  }
-
-  const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
-
+  // No body: the refresh token is read from the HttpOnly cookie.
   const { data } = await axios.post<LoginResponse>(
     `${baseURL}/auth/refresh`,
-    { refreshToken },
+    {},
     {
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
     },
   );
 
-  saveAuthSession(
-    data.accessToken,
-    data.refreshToken,
-    getRememberMePreference(),
-    data.user.email,
-  );
+  setAccessToken(data.accessToken);
+  markSessionActive(getRememberMePreference(), data.user.email);
 
   return data.accessToken;
 }
