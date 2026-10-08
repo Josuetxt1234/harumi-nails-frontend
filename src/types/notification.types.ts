@@ -1,6 +1,8 @@
 export type NotificationType =
   | 'VOUCHER_CREATED'
   | 'VOUCHER_CANCELLED'
+  | 'PAYROLL_GENERATED'
+  | 'PAYROLL_CLOSED'
   | 'SYSTEM';
 
 export type NotificationRole = 'SUPER_ADMIN' | 'ADMIN' | 'MESA';

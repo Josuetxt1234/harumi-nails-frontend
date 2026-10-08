@@ -4,6 +4,7 @@ import { SYSTEM_ROLES } from '../constants/roles.constants';
 import i18n from '../i18n';
 import { calculateRegisterTotals } from '../lib/calculate-register-totals';
 import { getApiErrorMessage } from '../lib/get-api-error';
+import { notifyNotificationsChanged } from '../lib/notifications-sync';
 import { formatMoney } from '../lib/money';
 import { parseDecimalInput } from '../lib/parse-decimal-input';
 import { createDailyRegister, listMesaUsers } from '../services/daily-register.service';
@@ -252,6 +253,7 @@ export function useDailyRegisterForm({
           commission: formatMoney(register.totalCommission),
         }),
       );
+      notifyNotificationsChanged();
       onRegistered?.();
     } catch (error) {
       setErrorMessage(

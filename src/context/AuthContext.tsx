@@ -25,6 +25,7 @@ import {
 interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isInitializing: boolean;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<AuthUser>;
   logout: () => Promise<void>;
@@ -39,7 +40,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     return subscribeAuthSessionExpired(() => {
@@ -57,14 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const restoredSession = await restoreSession();
 
-        if (!restoredSession) {
-          return;
-        }
-
-        const profile = await getCurrentUser();
-
         if (isMounted) {
-          setUser(profile);
+          setUser(restoredSession?.user ?? null);
         }
       } catch {
         if (isMounted) {
@@ -72,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } finally {
         if (isMounted) {
-          setIsLoading(false);
+          setIsInitializing(false);
         }
       }
     }
@@ -124,7 +119,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       isAuthenticated: Boolean(user),
-      isLoading,
+      isInitializing,
+      isLoading: isInitializing,
       login,
       logout,
       refreshProfile,
@@ -134,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }),
     [
       user,
-      isLoading,
+      isInitializing,
       login,
       logout,
       refreshProfile,

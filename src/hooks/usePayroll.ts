@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import i18n from '../i18n';
 import { getApiErrorMessage } from '../lib/get-api-error';
+import { notifyNotificationsChanged } from '../lib/notifications-sync';
 import { getCurrentPayrollWeek, toSalonDateKey, toSalonPeriodEndDateKey } from '../lib/payroll-week';
 import { listMesaUsers } from '../services/daily-register.service';
 import {
@@ -156,13 +157,24 @@ export function usePayroll({ scope }: UsePayrollOptions) {
     setSuccessMessage('');
 
     try {
+      const updatingDraft =
+        generatedPayroll?.status === 'DRAFT' &&
+        generatedPayroll.mesaUserId === mesaUserId &&
+        toSalonDateKey(generatedPayroll.periodStart) === periodStart;
       const payroll = await generatePayroll({
         mesaUserId,
         periodStart,
         periodEnd,
       });
       setGeneratedPayroll(payroll);
-      setSuccessMessage(i18n.t('notifications:payroll_generated'));
+      setSuccessMessage(
+        i18n.t(
+          updatingDraft
+            ? 'notifications:payroll_updated'
+            : 'notifications:payroll_generated',
+        ),
+      );
+      notifyNotificationsChanged();
       await refreshPayrolls();
     } catch (error) {
       setErrorMessage(
@@ -171,7 +183,7 @@ export function usePayroll({ scope }: UsePayrollOptions) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [mesaUserId, periodEnd, periodStart, refreshPayrolls]);
+  }, [generatedPayroll, mesaUserId, periodEnd, periodStart, refreshPayrolls]);
 
   const close = useCallback(async () => {
     if (!generatedPayroll) {
@@ -186,6 +198,7 @@ export function usePayroll({ scope }: UsePayrollOptions) {
       const payroll = await closePayroll(generatedPayroll.id);
       setGeneratedPayroll(payroll);
       setSuccessMessage(i18n.t('notifications:payroll_closed'));
+      notifyNotificationsChanged();
       await refreshPayrolls();
     } catch (error) {
       setErrorMessage(
@@ -196,21 +209,16 @@ export function usePayroll({ scope }: UsePayrollOptions) {
     }
   }, [generatedPayroll, refreshPayrolls]);
 
-  const totals = {
-    grossSales: generatedPayroll?.grossSales ?? preview?.grossSales ?? 0,
-    baseCommissionTotal:
-      generatedPayroll?.baseCommissionTotal ??
-      preview?.baseCommissionTotal ??
-      0,
-    weekendBonusTotal:
-      generatedPayroll?.weekendBonusTotal ?? preview?.weekendBonusTotal ?? 0,
-    advancesDeductionTotal:
-      generatedPayroll?.advancesDeductionTotal ??
-      preview?.advancesDeductionTotal ??
-      0,
-    netPayable: generatedPayroll?.netPayable ?? preview?.netPayable ?? 0,
-    registersCount: preview?.registersCount ?? 0,
-    advancesCount: preview?.advancesCount ?? 0,
+    const liveDraft = generatedPayroll?.status === 'DRAFT' ? preview : null;
+    const moneySource = liveDraft ?? generatedPayroll ?? preview;
+    const totals = {
+    grossSales: moneySource?.grossSales ?? 0,
+    baseCommissionTotal: moneySource?.baseCommissionTotal ?? 0,
+    weekendBonusTotal: moneySource?.weekendBonusTotal ?? 0,
+    advancesDeductionTotal: moneySource?.advancesDeductionTotal ?? 0,
+    netPayable: moneySource?.netPayable ?? 0,
+    registersCount: liveDraft?.registersCount ?? preview?.registersCount ?? 0,
+    advancesCount: liveDraft?.advancesCount ?? preview?.advancesCount ?? 0,
   };
 
   return {

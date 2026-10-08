@@ -37,11 +37,6 @@ export function RoleSelector({
             >
               {getRoleLabel(role.name)}
             </p>
-            {role.description ? (
-              <p className="mt-1 max-w-xs text-xs text-slate-body">
-                {role.description}
-              </p>
-            ) : null}
           </button>
         );
       })}

@@ -3,6 +3,7 @@ import { SYSTEM_ROLES } from '../constants/roles.constants';
 import { useAuth } from '../context/AuthContext';
 import i18n from '../i18n';
 import { getApiErrorMessage } from '../lib/get-api-error';
+import { notifyNotificationsChanged } from '../lib/notifications-sync';
 import { SALON_TIMEZONE } from '../lib/salon-timezone';
 import {
   listDailyRegisters,
@@ -166,6 +167,7 @@ export function useDailyRegistersHistory(
       try {
         await voidDailyRegister(registerId);
         setSuccessMessage(i18n.t('notifications:register_voided'));
+        notifyNotificationsChanged();
         await refreshRegisters();
       } catch (error) {
         setErrorMessage(

@@ -4,12 +4,10 @@ import {
 } from '../lib/access-token-store';
 import {
   clearStoredSession,
-  getRememberMePreference,
-  hasStoredSession,
   markSessionActive,
 } from '../lib/auth-storage';
 import type { AuthUser, LoginPayload, LoginResponse } from '../types/auth.types';
-import api from './api';
+import api, { refreshSessionSingleFlight } from './api';
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const { data } = await api.post<LoginResponse>('/auth/login', payload);
@@ -20,27 +18,8 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
   return data;
 }
 
-export async function refreshSession(): Promise<LoginResponse> {
-  const { data } = await api.post<LoginResponse>('/auth/refresh');
-
-  setAccessToken(data.accessToken);
-  markSessionActive(getRememberMePreference(), data.user.email);
-
-  return data;
-}
-
 export async function restoreSession(): Promise<LoginResponse | null> {
-  if (!hasStoredSession()) {
-    return null;
-  }
-
-  try {
-    return await refreshSession();
-  } catch {
-    clearAccessToken();
-    clearStoredSession();
-    return null;
-  }
+  return refreshSessionSingleFlight();
 }
 
 export async function getCurrentUser(): Promise<AuthUser> {

@@ -2,6 +2,7 @@ import type {
   GeneratePayrollInput,
   PaginatedPayrolls,
   Payroll,
+  PayrollDetail,
   PayrollPreview,
   ListPayrollParams,
 } from '../types/payroll.types';
@@ -39,6 +40,11 @@ export async function getPayrolls(
       limit: params?.limit ?? 50,
     },
   });
+  return data;
+}
+
+export async function getMyPayroll(id: string): Promise<PayrollDetail> {
+  const { data } = await api.get<PayrollDetail>(`/payroll/me/${id}`);
   return data;
 }
 

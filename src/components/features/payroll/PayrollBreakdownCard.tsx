@@ -157,7 +157,9 @@ export function PayrollBreakdownCard({
             className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-60"
           >
             <Settings2 className="h-4 w-4" />
-            {t('payroll:generate')}
+            {generatedPayroll?.status === 'DRAFT'
+              ? t('payroll:update_draft')
+              : t('payroll:generate')}
           </button>
           {canClose || isClosed ? (
             <button

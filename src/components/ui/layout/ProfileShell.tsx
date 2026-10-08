@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../context/AuthContext';
 import { getDefaultRouteForRoles } from '../../../lib/get-default-route';
 import { LanguageSwitcher } from '../navigation/LanguageSwitcher';
+import { NotificationBell } from '../navigation/NotificationBell';
 
 interface ProfileShellProps {
   children: ReactNode;
@@ -34,6 +35,7 @@ export function ProfileShell({ children }: ProfileShellProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <NotificationBell />
             <LanguageSwitcher />
             <Link
               to={backRoute}

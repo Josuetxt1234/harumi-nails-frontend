@@ -25,6 +25,35 @@ export interface PayrollPreview extends PayrollTotals {
   advancesCount: number;
 }
 
+export interface PayrollServiceLine {
+  serviceName: string;
+  quantity: number;
+  lineSubtotal: number;
+  lineCommission: number;
+}
+
+export interface PayrollWorkLine {
+  id: string;
+  clientName: string;
+  createdAt: string;
+  totalPaid: number;
+  totalCommission: number;
+  services: PayrollServiceLine[];
+}
+
+export interface PayrollAdvanceLine {
+  id: string;
+  amount: number;
+  reason: string | null;
+  date: string;
+  status: 'PENDING' | 'APPLIED' | 'CANCELLED';
+}
+
+export interface PayrollDetail extends Payroll {
+  registers: PayrollWorkLine[];
+  advances: PayrollAdvanceLine[];
+}
+
 export interface Payroll extends PayrollTotals {
   id: string;
   mesaUserId: string;

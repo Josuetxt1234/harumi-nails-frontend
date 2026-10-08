@@ -214,6 +214,15 @@
     "net_formula": "Neto = (Comisión base + Bono 5% fin de semana) − Vales ({{amount}})",
     "net_headline": "= Pago neto líquido a entregar",
     "generate": "Generar nómina",
+    "update_draft": "Actualizar borrador",
+    "draft_review": "Borrador en revisión",
+    "draft_review_hint": "Revisa tus trabajos y vales antes del cierre.",
+    "history": "Historial",
+    "history_hint": "Se muestran las últimas 8 liquidaciones cerradas.",
+    "works": "Trabajos realizados",
+    "no_works": "No hay trabajos en este periodo.",
+    "detail_title": "Detalle de nómina",
+    "client": "Cliente",
     "preview": "Vista previa",
     "close": "Cerrar nómina",
     "closed_label": "Nómina cerrada",
@@ -314,6 +323,7 @@
     "voucher_created": "Vale entregado correctamente.",
     "voucher_cancelled": "Vale anulado correctamente.",
     "payroll_generated": "Nómina generada en borrador.",
+    "payroll_updated": "Borrador de nómina actualizado.",
     "payroll_closed": "Nómina cerrada. El periodo quedó congelado.",
     "movement_registered": "Movimiento de inventario registrado.",
     "material_created": "Insumo creado correctamente.",
@@ -335,6 +345,8 @@
     "material_code_exists": "El código de material ya existe.",
     "voucher_applied": "El vale ya está aplicado o anulado.",
     "payroll_already_generated": "La nómina ya fue generada.",
+    "payroll_already_closed": "Esta nómina ya está cerrada y no se puede modificar.",
+    "payroll_detail": "No se pudo cargar el detalle de la nómina.",
     "payroll_not_draft": "Solo se puede cerrar una nómina en borrador.",
     "voucher_not_pending": "Solo se puede anular un vale pendiente.",
     "voucher_not_found": "Vale no encontrado.",
@@ -541,7 +553,96 @@
     "group_advances": "Vales",
     "group_audit": "Auditoría",
     "group_services": "Servicios",
-    "group_daily_registers": "Registros diarios"
+    "group_daily_registers": "Registros diarios",
+    "group_notifications": "Notificaciones",
+    "perm": {
+      "profile": {
+        "read": "Ver perfil",
+        "update": "Actualizar perfil",
+        "change_password": "Cambiar contraseña"
+      },
+      "users": {
+        "list": "Listar usuarios",
+        "read": "Ver usuarios",
+        "create": "Crear usuarios",
+        "update": "Editar usuarios",
+        "delete": "Eliminar usuarios",
+        "activate": "Activar usuarios",
+        "deactivate": "Desactivar usuarios",
+        "force_password_reset": "Forzar cambio de contraseña",
+        "assign_role": "Asignar roles",
+        "revoke_role": "Revocar roles"
+      },
+      "roles": {
+        "list": "Listar roles",
+        "read": "Ver roles",
+        "create": "Crear roles",
+        "update": "Editar roles",
+        "delete": "Eliminar roles"
+      },
+      "permissions": {
+        "list": "Listar permisos",
+        "read": "Ver permisos",
+        "assign_to_role": "Asignar permisos a un rol"
+      },
+      "services": {
+        "list": "Listar servicios",
+        "read": "Ver servicios",
+        "create": "Crear servicios",
+        "update": "Editar servicios",
+        "delete": "Eliminar servicios"
+      },
+      "daily_registers": {
+        "create": "Registrar ventas",
+        "list": "Listar registros diarios",
+        "read": "Ver registros diarios",
+        "void": "Anular registros diarios"
+      },
+      "advances": {
+        "create": "Crear vales",
+        "list": "Listar vales",
+        "read": "Ver vales",
+        "cancel": "Cancelar vales",
+        "delete": "Eliminar vales"
+      },
+      "appointments": {
+        "list": "Listar citas",
+        "read": "Ver citas",
+        "create": "Crear citas",
+        "update": "Editar citas",
+        "cancel": "Cancelar citas",
+        "reassign": "Reasignar citas"
+      },
+      "pos": {
+        "open_register": "Abrir caja",
+        "close_register": "Cerrar caja",
+        "create_sale": "Crear venta POS",
+        "read_sales": "Ver ventas POS"
+      },
+      "inventory": {
+        "list": "Listar inventario",
+        "read": "Ver inventario",
+        "create": "Crear inventario",
+        "update": "Editar inventario",
+        "request_restock": "Solicitar reposición"
+      },
+      "payroll": {
+        "list": "Listar nóminas",
+        "read": "Ver nómina",
+        "create": "Generar nómina",
+        "close": "Cerrar nómina",
+        "calculate": "Calcular nómina",
+        "approve": "Aprobar nómina"
+      },
+      "audit": {
+        "list": "Listar auditoría",
+        "read": "Ver auditoría"
+      },
+      "notifications": {
+        "list": "Ver notificaciones",
+        "update": "Marcar notificaciones"
+      }
+    }
   },
   "profile": {
     "loading": "Cargando perfil...",

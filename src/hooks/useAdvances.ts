@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import i18n from '../i18n';
 import { getApiErrorMessage } from '../lib/get-api-error';
+import { notifyNotificationsChanged } from '../lib/notifications-sync';
 import {
   cancelAdvance,
   createAdvance,
@@ -85,6 +86,7 @@ export function useAdvances({ scope }: UseAdvancesOptions) {
         await createAdvance(input);
         setSuccessMessage(i18n.t('notifications:voucher_created'));
         setIsCreateOpen(false);
+        notifyNotificationsChanged();
         await refreshAdvances();
       } catch (error) {
         setErrorMessage(
@@ -108,6 +110,7 @@ export function useAdvances({ scope }: UseAdvancesOptions) {
         await cancelAdvance(advanceId, reason);
         setSuccessMessage(i18n.t('notifications:voucher_cancelled'));
         setAdvanceToCancel(null);
+        notifyNotificationsChanged();
         await refreshAdvances();
       } catch (error) {
         setErrorMessage(

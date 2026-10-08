@@ -13,16 +13,23 @@ import { notifyAuthSessionExpired } from '../lib/auth-session';
 import type { LoginResponse } from '../types/auth.types';
 
 function resolveApiBaseUrl(raw: string | undefined): string {
-  const trimmed = (raw ?? 'http://localhost:3000/api').trim().replace(/\/+$/, '');
+  let trimmed = (raw ?? 'http://localhost:3000/api').trim().replace(/\/+$/, '');
 
   if (!trimmed) {
     return 'http://localhost:3000/api';
   }
 
+  // Without a scheme, Axios treats the host as a path on the Vercel origin
+  // and POST /login hits the SPA (405) instead of Railway.
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = `https://${trimmed}`;
+  }
+
   return /\/api$/i.test(trimmed) ? trimmed : `${trimmed}/api`;
 }
 
-const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
+export const apiBaseUrl = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
+const baseURL = apiBaseUrl;
 
 const api = axios.create({
   baseURL,
@@ -47,16 +54,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-let refreshPromise: Promise<string | null> | null = null;
+let refreshPromise: Promise<LoginResponse | null> | null = null;
 
-function expireAuthSession(): void {
-  clearAccessToken();
-  clearStoredSession();
-  notifyAuthSessionExpired();
-}
-
-async function refreshAccessToken(): Promise<string | null> {
-  // No body: the refresh token is read from the HttpOnly cookie.
+async function performRefresh(): Promise<LoginResponse> {
+  // Raw Axios, not the `api` instance: a 401 here must not re-enter the
+  // response interceptor and rotate the cookie a second time.
   const { data } = await axios.post<LoginResponse>(
     `${baseURL}/auth/refresh`,
     {},
@@ -68,10 +70,43 @@ async function refreshAccessToken(): Promise<string | null> {
     },
   );
 
+  if (!data?.accessToken || !data.user?.id) {
+    throw new Error('Refresh response is missing the access token.');
+  }
+
   setAccessToken(data.accessToken);
   markSessionActive(getRememberMePreference(), data.user.email);
 
-  return data.accessToken;
+  return data;
+}
+
+/**
+ * One in-flight refresh for the whole tab. React StrictMode runs the boot
+ * effect twice; a second POST would reuse a rotated token and revoke the session.
+ */
+export function refreshSessionSingleFlight(options?: {
+  expireOnFailure?: boolean;
+}): Promise<LoginResponse | null> {
+  if (!refreshPromise) {
+    const expireOnFailure = options?.expireOnFailure === true;
+
+    refreshPromise = performRefresh()
+      .catch(() => {
+        clearAccessToken();
+        clearStoredSession();
+
+        if (expireOnFailure) {
+          notifyAuthSessionExpired();
+        }
+
+        return null;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
 }
 
 api.interceptors.response.use(
@@ -93,18 +128,10 @@ api.interceptors.response.use(
 
     originalRequest._retry = true;
 
-    if (!refreshPromise) {
-      refreshPromise = refreshAccessToken()
-        .catch(() => {
-          expireAuthSession();
-          return null;
-        })
-        .finally(() => {
-          refreshPromise = null;
-        });
-    }
-
-    const newAccessToken = await refreshPromise;
+    const refreshed = await refreshSessionSingleFlight({
+      expireOnFailure: true,
+    });
+    const newAccessToken = refreshed?.accessToken ?? null;
 
     if (!newAccessToken) {
       return Promise.reject(error);

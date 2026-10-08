@@ -214,6 +214,15 @@
     "net_formula": "Net = (Base commission + 5% weekend bonus) − Vouchers ({{amount}})",
     "net_headline": "= Net cash to deliver",
     "generate": "Generate payroll",
+    "update_draft": "Update draft",
+    "draft_review": "Draft under review",
+    "draft_review_hint": "Review your jobs and vouchers before closing.",
+    "history": "History",
+    "history_hint": "The last 8 closed settlements are shown.",
+    "works": "Jobs performed",
+    "no_works": "There are no jobs in this period.",
+    "detail_title": "Payroll detail",
+    "client": "Client",
     "preview": "Preview",
     "close": "Close payroll",
     "closed_label": "Payroll closed",
@@ -314,6 +323,7 @@
     "voucher_created": "Voucher issued successfully.",
     "voucher_cancelled": "Voucher cancelled successfully.",
     "payroll_generated": "Payroll generated as draft.",
+    "payroll_updated": "Payroll draft updated.",
     "payroll_closed": "Payroll closed. The period is frozen.",
     "movement_registered": "Inventory movement registered.",
     "material_created": "Material created successfully.",
@@ -335,6 +345,8 @@
     "material_code_exists": "Material code already exists.",
     "voucher_applied": "Voucher already applied or cancelled.",
     "payroll_already_generated": "Payroll has already been generated.",
+    "payroll_already_closed": "This payroll is already closed and cannot be changed.",
+    "payroll_detail": "Could not load the payroll detail.",
     "payroll_not_draft": "Only a DRAFT payroll can be closed.",
     "voucher_not_pending": "Only a PENDING voucher can be cancelled.",
     "voucher_not_found": "Advance not found.",
@@ -541,7 +553,96 @@
     "group_advances": "Vouchers",
     "group_audit": "Audit",
     "group_services": "Services",
-    "group_daily_registers": "Daily registers"
+    "group_daily_registers": "Daily registers",
+    "group_notifications": "Notifications",
+    "perm": {
+      "profile": {
+        "read": "View profile",
+        "update": "Update profile",
+        "change_password": "Change password"
+      },
+      "users": {
+        "list": "List users",
+        "read": "View users",
+        "create": "Create users",
+        "update": "Update users",
+        "delete": "Delete users",
+        "activate": "Activate users",
+        "deactivate": "Deactivate users",
+        "force_password_reset": "Force password reset",
+        "assign_role": "Assign roles",
+        "revoke_role": "Revoke roles"
+      },
+      "roles": {
+        "list": "List roles",
+        "read": "View roles",
+        "create": "Create roles",
+        "update": "Update roles",
+        "delete": "Delete roles"
+      },
+      "permissions": {
+        "list": "List permissions",
+        "read": "View permissions",
+        "assign_to_role": "Assign permissions to a role"
+      },
+      "services": {
+        "list": "List services",
+        "read": "View services",
+        "create": "Create services",
+        "update": "Update services",
+        "delete": "Delete services"
+      },
+      "daily_registers": {
+        "create": "Create sales",
+        "list": "List daily registers",
+        "read": "View daily registers",
+        "void": "Void daily registers"
+      },
+      "advances": {
+        "create": "Create vouchers",
+        "list": "List vouchers",
+        "read": "View vouchers",
+        "cancel": "Cancel vouchers",
+        "delete": "Delete vouchers"
+      },
+      "appointments": {
+        "list": "List appointments",
+        "read": "View appointments",
+        "create": "Create appointments",
+        "update": "Update appointments",
+        "cancel": "Cancel appointments",
+        "reassign": "Reassign appointments"
+      },
+      "pos": {
+        "open_register": "Open cash register",
+        "close_register": "Close cash register",
+        "create_sale": "Create POS sale",
+        "read_sales": "View POS sales"
+      },
+      "inventory": {
+        "list": "List inventory",
+        "read": "View inventory",
+        "create": "Create inventory",
+        "update": "Update inventory",
+        "request_restock": "Request restock"
+      },
+      "payroll": {
+        "list": "List payrolls",
+        "read": "View payroll",
+        "create": "Generate payroll",
+        "close": "Close payroll",
+        "calculate": "Calculate payroll",
+        "approve": "Approve payroll"
+      },
+      "audit": {
+        "list": "List audit",
+        "read": "View audit"
+      },
+      "notifications": {
+        "list": "View notifications",
+        "update": "Update notifications"
+      }
+    }
   },
   "profile": {
     "loading": "Loading profile...",

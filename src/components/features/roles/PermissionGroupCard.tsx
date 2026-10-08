@@ -1,3 +1,4 @@
+import { getPermissionLabel } from '../../../lib/format-permission';
 import type { PermissionGroup } from '../../../lib/group-permissions';
 import type { PermissionSummary } from '../../../types/permission.types';
 import { useTranslation } from 'react-i18next';
@@ -72,8 +73,11 @@ function PermissionToggleRow({
   onToggle,
 }: PermissionToggleRowProps) {
   const { t } = useTranslation('roles');
-  const actionLabel =
-    permission.description?.trim() || formatPermissionLabel(permission.name);
+  const actionLabel = getPermissionLabel(
+    t,
+    permission.name,
+    permission.description,
+  );
 
   return (
     <label
@@ -106,18 +110,4 @@ function PermissionToggleRow({
       </span>
     </label>
   );
-}
-
-function formatPermissionLabel(name: string): string {
-  const [resource, ...actionParts] = name.split('.');
-  const action = actionParts.join(' ').replace(/_/g, ' ');
-
-  if (!action) {
-    return name;
-  }
-
-  const capitalizedAction =
-    action.charAt(0).toUpperCase() + action.slice(1).toLowerCase();
-
-  return `${capitalizedAction} ${resource}`;
 }

@@ -130,6 +130,12 @@ export const MESA_SHELL: DashboardShellConfig = {
       requiredAnyPermission: DAILY_REGISTER_NAV_PERMISSIONS,
     },
     {
+      labelKey: 'my_payroll',
+      path: '/mesa/nomina',
+      icon: Banknote,
+      requiredAnyPermission: [PERMISSIONS.PAYROLL_READ],
+    },
+    {
       labelKey: 'inventory',
       path: '/mesa/inventario',
       icon: Warehouse,

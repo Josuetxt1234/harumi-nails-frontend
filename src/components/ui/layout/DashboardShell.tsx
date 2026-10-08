@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { DashboardShellConfig } from '../../../constants/navigation.constants';
 import { useTranslation } from 'react-i18next';
+import { NotificationBell } from '../navigation/NotificationBell';
 import { DashboardSidebar } from './DashboardSidebar';
 import { MobileAppBar } from './MobileAppBar';
 import { MobileNavDrawer } from './MobileNavDrawer';
@@ -43,6 +44,9 @@ export function DashboardShell({
           onMenuClick={() => setIsMobileNavOpen(true)}
           brandSubtitle={t(config.brandSubtitleKey)}
         />
+        <header className="sticky top-0 z-20 hidden shrink-0 items-center justify-end border-b border-slate-border bg-white px-6 py-2 md:flex lg:px-10">
+          <NotificationBell />
+        </header>
         <main className="flex flex-1 flex-col overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:min-h-0 lg:overflow-hidden lg:px-10 lg:py-8">
           {children}
         </main>

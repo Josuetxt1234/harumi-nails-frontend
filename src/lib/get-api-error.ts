@@ -16,6 +16,7 @@ const EXACT_MESSAGE_KEYS: Record<string, string> = {
   'Voucher already applied or cancelled': 'errors:voucher_applied',
   'Voucher cannot be cancelled': 'errors:voucher_cannot_cancel',
   'Payroll has already been generated': 'errors:payroll_already_generated',
+  'Payroll for this period is already closed': 'errors:payroll_already_closed',
   'Only a DRAFT payroll can be closed.': 'errors:payroll_not_draft',
   'Only a PENDING voucher can be cancelled.': 'errors:voucher_not_pending',
   'Only Super Admin can cancel vouchers from previous days':
